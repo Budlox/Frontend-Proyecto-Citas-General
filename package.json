@@ -1,0 +1,14 @@
+{
+  "name": "frontendproyecto",
+  "version": "1.0.0",
+  "description": "Frontend del rpoyecto de Progra 7",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Yustin Pérez",
+  "license": "ISC",
+  "dependencies": {
+    "@angular/cli": "^18.0.4"
+  }
+}

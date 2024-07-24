@@ -1,0 +1,102 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    cursor: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/106114/cursor.png) 32 32, move;
+    background: rgb(238, 238, 238);
+    overflow: hidden;
+  }
+  
+  *, *:before, *:after {
+    box-sizing: border-box;
+  }
+  
+  .main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+  
+  .form-container {
+    width: 320px;
+    margin-bottom: 20px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .user-list {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .user-list li {
+    width: calc(33.3333% - 20px); /* Adjust width based on number of columns */
+    margin: 10px;
+    min-width: 200px; /* Minimum width to prevent items from collapsing */
+    box-sizing: border-box;
+  }
+  
+  .list-item {
+    cursor: pointer;
+  }
+  
+  .item-content {
+    height: 60px;
+    border: 1px solid rgba(123, 123, 123, 0.5);
+    border-radius: 4px;
+    color: rgb(153, 153, 153);
+    line-height: 60px;
+    padding-left: 16px;
+    font-size: 18px;
+    font-weight: 400;
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 2px 0px;
+    overflow: hidden; /* Ensure text does not overflow */
+    white-space: nowrap; /* Prevent text wrapping */
+    text-overflow: ellipsis; /* Show ellipsis for overflow text */
+  }
+  
+  .selected .item-content {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .pagination {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .pagination-top {
+    margin-bottom: 10px;
+  }
+  
+  .pagination button {
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  .pagination-text {
+    margin: 0 10px; /* Adjust margin as needed */
+  }
+  
+  .modify-button img {
+    width: 24px; /* Adjust size as needed */
+    height: 24px; /* Adjust size as needed */
+  }
+  
+  .delete-button {
+    margin-left: 10px;
+  }

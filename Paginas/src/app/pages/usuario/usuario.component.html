@@ -1,0 +1,49 @@
+<br />
+<br />
+  <h2>{{ Titulo }}</h2>
+  <div>
+    <label for="nombreUsuario">Nombre de Usuario:</label>
+    <input id="nombreUsuario" [(ngModel)]="nombreUsuario" type="text"/>
+    <br/>
+
+    <label for="email">Correo:</label>
+    <input id="email" [(ngModel)]="email" type="text"/>
+    <br/>
+
+    <label for="contrasenna">Contraseña:</label>
+    <input id="contrasenna" [(ngModel)]="contrasenna" type="password"/>
+    <br/>
+    <br/>
+    <button (click)="agregarUsuario()">Guardar</button>
+    <br/>
+  </div>
+<br />
+<br />
+
+<h2>{{ Titulo2 }}</h2>
+
+<ul class="user-list">
+  <li *ngFor="let usuario of UsuariosPorPagina(); let i = index; trackBy: trackById" 
+      [class.selected]="isSelected(usuario)" 
+      (click)="selectUsuario(usuario)">
+    <div class="list-item">
+      <div class="item-content">
+        <span class="order">{{ usuario.IdUsuario }}</span> {{ usuario.NombreUsuario }}
+        <button class="modify-button" (click)="modificarUsuario(usuario)">Modificar
+        </button>
+        <button class="delete-button" (click)="borrarUsuario(usuario.IdUsuario)">
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </li>
+  <li *ngIf="UsuariosPorPagina().length === 0">Nada que mostrar.</li>
+</ul>
+
+<div class="pagination">
+  <div class="pagination-top">
+    <button (click)="PaginaAnterior()" [disabled]="PaginaActual === 1">Anterior</button>
+    <span class="pagination-text">Página {{ PaginaActual }} de {{ TotalPaginas }}</span>
+    <button (click)="PaginaSiguiente()" [disabled]="PaginaActual === TotalPaginas">Siguiente</button>
+  </div>
+</div>
