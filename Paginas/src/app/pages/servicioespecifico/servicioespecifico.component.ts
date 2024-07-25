@@ -13,8 +13,8 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./servicioespecifico.component.css']
 })
 export class ServicioespecificoComponent {
-  public Titulo = 'Administración de Servicios Generales';
-  public Titulo2 = 'Lista de Servicios Generales';
+  public Titulo = 'Administración de Servicios Específicos';
+  public Titulo2 = 'Lista de Servicios Específicos';
   public ServiciosGeneral = signal<ServicioGeneral[]>([]);
   public ServiciosEspecifico = signal<ServicioEspecifico[]>([]);
   public EspecificosFiltrados: ServicioEspecifico[] = [];
