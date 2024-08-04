@@ -15,8 +15,8 @@
 <h2>{{ Titulo2 }}</h2>
 
 <ul class="user-list">
-  <li *ngFor="let servicio of ServiciosPorPagina(); let i = index; trackBy: trackById" 
-      [class.selected]="isSelected(servicio)" 
+  <li *ngFor="let servicio of ServiciosPorPagina(); let i = index; trackBy: trackById"
+      [class.selected]="isSelected(servicio)"
       (click)="selectServicio(servicio)">
     <div class="list-item">
       <div class="item-content">
@@ -31,6 +31,7 @@
   </li>
   <li *ngIf="ServiciosPorPagina().length === 0">Nada que mostrar.</li>
 </ul>
+
 
 <div class="pagination">
   <div class="pagination-top">

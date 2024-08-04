@@ -10,7 +10,7 @@
 .dropdownmenu li {
 	float: left;
 	position: relative;
-	width:auto;
+	width: auto;
 }
 .dropdownmenu a {
 	background: #30A6E6;
@@ -50,5 +50,15 @@ li:hover ul#submenu {
 	background: #DF4B05;
 }
 #submenu a {
-	background-color:#000000;
+	background-color: #000000;
+}
+
+footer {
+	background-color: gray;
+	color: white;
+	text-align: center;
+	padding: 1px 0;
+	position: absolute;
+	width: 100%;
+	bottom: 0;
 }

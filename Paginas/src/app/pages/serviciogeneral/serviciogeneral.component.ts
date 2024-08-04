@@ -1,8 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ServicioGeneral } from '../../model/serviciosgeneral';
 import { JsonPipe, CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-serviciogeneral',
@@ -14,7 +15,7 @@ import { HttpClient } from '@angular/common/http';
 export class ServicioGeneralComponent {
   public Titulo = 'Administración de Servicios Generales';
   public Titulo2 = 'Lista de Servicios Generales';
-  public Servicios = signal<ServicioGeneral[]>([]);
+  public Servicios: ServicioGeneral[] = [];
   public ServicioSeleccionado: ServicioGeneral | null = null;
 
   public NombreServicio: string = '';
@@ -23,53 +24,120 @@ export class ServicioGeneralComponent {
   public itemPorPagina: number = 6;
   public PaginaActual: number = 1;
 
-  constructor(private http: HttpClient) {
-    this.metodoGETServicioGeneral();
+  constructor(private http: HttpClient, private router: Router) {
+    this.verificarTokenYcargarDatos();
+  }
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    console.log('Token:', token); // Verificar el token
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  }
+
+  private verificarToken(): Promise<boolean> {
+    const headers = this.getAuthHeaders();
+    return this.http.post<boolean>('http://localhost/usuario/validartoken', {}, { headers })
+      .toPromise()
+      .then(() => true)
+      .catch(() => false);
+  }
+
+  private verificarTokenYcargarDatos() {
+    this.verificarToken().then(isValid => {
+      if (isValid) {
+        this.metodoGETServicioGeneral();
+      } else {
+        this.router.navigate(['/login']);
+      }
+    });
   }
 
   public metodoGETServicioGeneral() {
-    this.http.get<ServicioGeneral[]>('http://localhost/serviciogeneral')
-      .subscribe((Servicios) => {
-        this.Servicios.set(Servicios);
+    const headers = this.getAuthHeaders();
+    this.http.get<{ ServiciosGenerales: ServicioGeneral[] }>('http://localhost/serviciogeneral', { headers })
+      .subscribe({
+        next: (response) => {
+          console.log('ServiciosGenerales recibidos:', response); // Verificar los datos recibidos
+          this.Servicios = response.ServiciosGenerales;
+        },
+        error: (error) => {
+          console.error('Error al obtener servicios:', error);
+        }
       });
   }
 
   public agregarServicio(): void {
-    let cuerpo: Partial<ServicioGeneral> = {
-      NombreServicio: this.NombreServicio
-    };
+    this.verificarToken().then(isValid => {
+      if (isValid) {
+        let cuerpo: Partial<ServicioGeneral> = {
+          NombreServicio: this.NombreServicio
+        };
 
-    if (this.IdServicio) {
-      // Update only the fields that have changed
-      if (this.Servicios().find(s => s.IdServicio === this.IdServicio)) {
-        this.http.put<ServicioGeneral>(`http://localhost/serviciogeneral/${this.IdServicio}`, cuerpo)
-          .subscribe(() => {
-            this.Servicios.update((servicios) =>
-              servicios.map((servicio) =>
-                servicio.IdServicio === this.IdServicio ? { ...servicio, ...cuerpo } : servicio
-              )
-            );
-            this.LimpiarForm();
-          },
-          (error) => console.error('Error updating service:', error)
-        );
+        const headers = this.getAuthHeaders();
+
+        if (this.IdServicio) {
+          // Update only the fields that have changed
+          if (this.Servicios.find(s => s.IdServicio === this.IdServicio)) {
+            this.http.put<{ Token: string }>(`http://localhost/serviciogeneral/${this.IdServicio}`, cuerpo, { headers })
+              .subscribe({
+                next: (response) => {
+                  this.Servicios = this.Servicios.map((servicio) =>
+                    servicio.IdServicio === this.IdServicio ? { ...servicio, ...cuerpo } : servicio
+                  );
+                  this.LimpiarForm();
+                  this.actualizarToken(response.Token);
+                },
+                error: (error) => {
+                  console.error('Error updating service:', error);
+                  this.router.navigate(['/login']);
+                }
+              });
+          }
+        } else {
+          this.http.post<{ Servicio: ServicioGeneral, Token: string }>('http://localhost/serviciogeneral', cuerpo, { headers })
+            .subscribe({
+              next: (response) => {
+                this.Servicios = [...this.Servicios, response.Servicio];
+                this.LimpiarForm();
+                this.actualizarToken(response.Token);
+              },
+              error: (error) => {
+                console.error('Error adding service:', error);
+                this.router.navigate(['/login']);
+              }
+            });
+        }
+      } else {
+        this.router.navigate(['/login']);
       }
-    } else {
-      this.http.post<ServicioGeneral>('http://localhost/serviciogeneral', cuerpo)
-        .subscribe((nuevoServicio) => {
-          this.Servicios.update((servicios) => [...servicios, nuevoServicio]);
-          this.LimpiarForm();
-        },
-        (error) => console.error('Error adding service:', error)
-      );
-    }
+    });
   }
 
-  public borrarServicio(IdServicio: any) {
-    this.http.delete(`http://localhost/serviciogeneral/${IdServicio}`)
-      .subscribe(() => {
-        this.Servicios.update((Servicios) => Servicios.filter((Servicio) => Servicio.IdServicio !== IdServicio));
-      });
+  public borrarServicio(IdServicio: any): void {
+    this.verificarToken().then(isValid => {
+      if (isValid) {
+        const headers = this.getAuthHeaders();
+        this.http.delete<{ Token: string }>(`http://localhost/serviciogeneral/${IdServicio}`, { headers })
+          .subscribe({
+            next: (response) => {
+              this.Servicios = this.Servicios.filter((Servicio) => Servicio.IdServicio !== IdServicio);
+              this.actualizarToken(response.Token);
+            },
+            error: (error) => {
+              console.error('Error deleting service:', error);
+              this.router.navigate(['/login']);
+            }
+          });
+      } else {
+        this.router.navigate(['/login']);
+      }
+    });
+  }
+
+  private actualizarToken(token: string): void {
+    localStorage.setItem('token', token);
   }
 
   public modificarServicio(servicio: ServicioGeneral): void {
@@ -91,12 +159,12 @@ export class ServicioGeneralComponent {
 
   public ServiciosPorPagina(): ServicioGeneral[] {
     const start = (this.PaginaActual - 1) * this.itemPorPagina;
-    const end = Math.min(start + this.itemPorPagina, this.Servicios().length);
-    return this.Servicios().slice(start, end);
+    const end = Math.min(start + this.itemPorPagina, this.Servicios.length);
+    return this.Servicios.slice(start, end);
   }
 
   public get TotalPaginas(): number {
-    return Math.ceil(this.Servicios().length / this.itemPorPagina);
+    return Math.ceil(this.Servicios.length / this.itemPorPagina);
   }
 
   public PaginaAnterior(): void {
