@@ -141,9 +141,15 @@ export class ServicioGeneralComponent {
   }
 
   public modificarServicio(servicio: ServicioGeneral): void {
-    this.NombreServicio = servicio.NombreServicio;
-    this.IdServicio = servicio.IdServicio ?? null;
-  }
+    this.verificarToken().then(isValid => {
+        if (isValid) {
+            this.NombreServicio = servicio.NombreServicio;
+            this.IdServicio = servicio.IdServicio ?? null;
+        } else {
+            this.router.navigate(['/login']);
+        }
+    });
+}
 
   public selectServicio(servicio: ServicioGeneral): void {
     this.ServicioSeleccionado = servicio;
