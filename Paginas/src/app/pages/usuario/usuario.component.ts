@@ -1,8 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Usuario } from '../../model/usuario';
 import { JsonPipe, CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-usuario',
@@ -14,7 +15,7 @@ import { HttpClient } from '@angular/common/http';
 export class UsuarioComponent {
   public Titulo = 'Administración de Usuarios';
   public Titulo2 = 'Lista de Usuarios';
-  public Usuarios = signal<Usuario[]>([]);
+  public Usuarios: Usuario[] = [];
   public UsuarioSeleccionado: Usuario | null = null;
   public UsuarioTemporal: Partial<Usuario> | null = null; // Temporary storage for user info
 
@@ -22,87 +23,156 @@ export class UsuarioComponent {
   public email: string = '';
   public contrasenna: string = '';
   public IdUsuario: number | null = null;
+  public rolSeleccionado: string = 'Nivel0'; // Default role value
+
+  public roles: string[] = ['Nivel0', 'Nivel1', 'Nivel2']; // Define roles
 
   public itemPorPagina: number = 6;
   public PaginaActual: number = 1;
 
-  constructor(private http: HttpClient) {
-    this.metodoGETUsuario();
+  constructor(private http: HttpClient, private router: Router) {
+    this.verificarTokenYcargarDatos();
   }
 
-  public metodoGETUsuario() {
-    this.http.get('http://localhost/usuario')
-    .subscribe((Usuarios) => {
-      const arr = Usuarios as Usuario[];
-      arr.forEach((Usuario) => {
-        Usuario.FechaRegistro = new Date(Usuario.FechaRegistro);
-        this.agregarUsuarioALaSenial(Usuario.NombreUsuario, 
-          Usuario.Email, Usuario.Contrasenna, Usuario.FechaRegistro, Usuario.IdUsuario);
-      });
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
     });
   }
 
-  public agregarUsuarioALaSenial(NombreUsuario: string, Email: string, Contrasenna: string, FechaRegistro: Date, IdUsuario?: number) {
-    let nuevoUsuario = { IdUsuario: IdUsuario, NombreUsuario: NombreUsuario, Email: Email, Contrasenna: Contrasenna, FechaRegistro: FechaRegistro };
-    this.Usuarios.update((Usuarios) => [...Usuarios, nuevoUsuario]);
+  private verificarToken(): Promise<boolean> {
+    const headers = this.getAuthHeaders();
+    return this.http.post<boolean>('http://localhost/usuario/validartoken', {}, { headers })
+      .toPromise()
+      .then(() => true)
+      .catch(() => false);
+  }
+
+  private verificarTokenYcargarDatos() {
+    this.verificarToken().then(isValid => {
+      if (isValid) {
+        this.metodoGETUsuario();
+      } else {
+        this.router.navigate(['/login']);
+      }
+    });
+  }
+
+  public metodoGETUsuario(): void {
+    this.verificarToken().then(isValid => {
+      if (isValid) {
+        const headers = this.getAuthHeaders();
+        this.http.get<{ Token: string; Usuarios: Usuario[] }>('http://localhost/usuario', { headers })
+          .subscribe({
+            next: (response) => {
+              // Actualizar la lista de usuarios con los datos recibidos
+              this.Usuarios = response.Usuarios;
+              this.actualizarToken(response.Token); // Actualizar el token en localStorage
+            },
+            error: (error) => {
+              console.error('Error al obtener usuarios:', error);
+              this.router.navigate(['/login']); // Redirigir al login si ocurre un error
+            }
+          });
+      } else {
+        console.error('Token inválido al obtener usuarios');
+        this.router.navigate(['/login']); // Redirigir al login si el token es inválido
+      }
+    });
   }
 
   public agregarUsuario(): void {
-    let cuerpo: Partial<Usuario> = {
-      NombreUsuario: this.nombreUsuario,
-      Email: this.email,
-      FechaRegistro: new Date()
-    };
+    this.verificarToken().then(isValid => {
+      if (isValid) {
+        const cuerpo: Partial<Usuario> = {
+          NombreUsuario: this.nombreUsuario,
+          Email: this.email,
+          Rol: this.rolSeleccionado,
+          FechaRegistro: new Date(),
+        };
 
-    // Only include password if it's not empty
-    if (this.contrasenna) {
-      cuerpo.Contrasenna = this.contrasenna;
-    }
-
-    if (this.IdUsuario) {
-      // Update only the fields that have changed
-      if (this.UsuarioTemporal) {
-        for (const key in cuerpo) {
-          if (cuerpo[key as keyof Usuario] === this.UsuarioTemporal[key as keyof Usuario]) {
-            delete cuerpo[key as keyof Usuario];
-          }
+        if (this.contrasenna) {
+          cuerpo.Contrasenna = this.contrasenna;
         }
+
+        const headers = this.getAuthHeaders();
+
+        if (this.IdUsuario) {
+          // Update existing user
+          this.http.put<Usuario>(`http://localhost/usuario/${this.IdUsuario}`, cuerpo, { headers })
+            .subscribe({
+              next: (usuarioActualizado) => {
+                this.Usuarios = this.Usuarios.map((usuario) =>
+                  usuario.IdUsuario === this.IdUsuario ? { ...usuario, ...cuerpo } : usuario
+                );
+                this.LimpiarForm();
+                this.actualizarToken(usuarioActualizado.Token);
+              },
+              error: (error) => {
+                console.error('Error updating user:', error);
+                this.router.navigate(['/login']);
+              }
+            });
+        } else {
+          // Create new user
+          this.http.post<{Usuario: Usuario, Token: string}>('http://localhost/usuario', cuerpo, { headers })
+            .subscribe({
+              next: (response) => {
+                this.Usuarios = [...this.Usuarios, response.Usuario];
+                this.LimpiarForm();
+                this.actualizarToken(response.Token);
+              },
+              error: (error) => {
+                console.error('Error adding user:', error);
+                this.router.navigate(['/login']);
+              }
+            });
+        }
+      } else {
+        this.router.navigate(['/login']);
       }
-
-      this.http.put(`http://localhost/usuario/${this.IdUsuario}`, cuerpo).subscribe(
-        () => {
-          this.Usuarios.update((usuarios) =>
-            usuarios.map((usuario) =>
-              usuario.IdUsuario === this.IdUsuario ? { ...usuario, ...cuerpo } : usuario
-            )
-          );
-          this.LimpiarForm();
-        },
-        (error) => console.error('Error updating user:', error)
-      );
-    } else {
-      this.http.post<Usuario>('http://localhost/usuario', cuerpo).subscribe(
-        (usuarioCreado) => {
-          this.Usuarios.update((usuarios) => [...usuarios, usuarioCreado]);
-          this.LimpiarForm();
-        },
-        (error) => console.error('Error adding user:', error)
-      );
-    }
-  }
-
-  public borrarUsuario(Id: any) {
-    this.http.delete('http://localhost/usuario/' + Id).subscribe(() => {
-      this.Usuarios.update((Usuarios) => Usuarios.filter((Usuario) => Usuario.IdUsuario !== Id));
     });
   }
 
+  public borrarUsuario(Id: number): void {
+    this.verificarToken().then(isValid => {
+      if (isValid) {
+        const headers = this.getAuthHeaders();
+        this.http.delete<{ Token: string }>(`http://localhost/usuario/${Id}`, { headers })
+          .subscribe({
+            next: (response) => {
+              this.Usuarios = this.Usuarios.filter((usuario) => usuario.IdUsuario !== Id);
+              this.actualizarToken(response.Token);
+            },
+            error: (error) => {
+              console.error('Error deleting user:', error);
+              this.router.navigate(['/login']);
+            }
+          });
+      } else {
+        this.router.navigate(['/login']);
+      }
+    });
+  }
+
+  private actualizarToken(token: string): void {
+    localStorage.setItem('token', token);
+  }
+
   public modificarUsuario(usuario: Usuario): void {
-    this.nombreUsuario = usuario.NombreUsuario;
-    this.email = usuario.Email;
-    this.contrasenna = ''; // Clear the password field
-    this.IdUsuario = usuario.IdUsuario ?? null;
-    this.UsuarioTemporal = { ...usuario }; // Store the original user information temporarily
+    this.verificarToken().then(isValid => {
+      if (isValid) {
+        this.nombreUsuario = usuario.NombreUsuario;
+        this.email = usuario.Email;
+        this.contrasenna = ''; // Clear the password field
+        this.IdUsuario = usuario.IdUsuario ?? null;
+        this.rolSeleccionado = usuario.Rol ?? 'Nivel0'; // Set the selected role
+        this.UsuarioTemporal = { ...usuario }; // Store the original user information temporarily
+      } else {
+        this.router.navigate(['/login']);
+      }
+    });
   }
 
   public selectUsuario(usuario: Usuario): void {
@@ -119,12 +189,12 @@ export class UsuarioComponent {
 
   public UsuariosPorPagina(): Usuario[] {
     const start = (this.PaginaActual - 1) * this.itemPorPagina;
-    const end = Math.min(start + this.itemPorPagina, this.Usuarios().length);
-    return this.Usuarios().slice(start, end);
+    const end = Math.min(start + this.itemPorPagina, this.Usuarios.length);
+    return this.Usuarios.slice(start, end);
   }
 
   public get TotalPaginas(): number {
-    return Math.ceil(this.Usuarios().length / this.itemPorPagina);
+    return Math.ceil(this.Usuarios.length / this.itemPorPagina);
   }
 
   public PaginaAnterior(): void {
@@ -144,8 +214,7 @@ export class UsuarioComponent {
     this.email = '';
     this.contrasenna = '';
     this.IdUsuario = null;
+    this.rolSeleccionado = 'Nivel0'; // Reset to default role
     this.UsuarioTemporal = null; // Clear the temporary storage
   }
 }
-
-
