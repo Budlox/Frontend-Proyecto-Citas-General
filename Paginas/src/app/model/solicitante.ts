@@ -3,5 +3,6 @@ export interface Solicitante {
     Email:              string;
     IdSolicitante:      number;
     Nombre_Solicitante: string;
+    Apellido_Solicitante: string;
    }
    

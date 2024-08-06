@@ -74,12 +74,13 @@ export class ServicioespecificoComponent {
       });
   }
 
+  //Ajustar los servicios especificos (la respuesta)
   public metodoGETServicioEspecifico() {
     const headers = this.getAuthHeaders();
-    this.http.get<ServicioEspecifico[]>('http://localhost/servicioespecifico', { headers })
+    this.http.get<{ ServiciosEspecificos: ServicioEspecifico[] }>('http://localhost/servicioespecifico', { headers })
       .subscribe({
-        next: (Servicios) => {
-          this.ServiciosEspecifico.set(Servicios);
+        next: (response) => {
+          this.ServiciosEspecifico.set(response.ServiciosEspecificos);
           // Reset EspecificosFiltrados to empty initially
           this.EspecificosFiltrados = [];
         },
@@ -102,8 +103,9 @@ export class ServicioespecificoComponent {
   }
 
   private filterEspecificos(): void {
+    const serviciosEspecificos = this.ServiciosEspecifico(); // Obtener el valor actual del signal
     if (this.ServicioGeneralFiltroSeleccionado) {
-      this.EspecificosFiltrados = this.ServiciosEspecifico().filter(
+      this.EspecificosFiltrados = serviciosEspecificos.filter(
         s => s.IdServicio === this.ServicioGeneralFiltroSeleccionado &&
              (this.busquedaNombre ? s.NombreServicioEspecifico.toLowerCase().includes(this.busquedaNombre.toLowerCase()) : true)
       );
@@ -111,6 +113,7 @@ export class ServicioespecificoComponent {
       this.EspecificosFiltrados = [];
     }
   }
+  
 
   public onSearchChange(): void {
     // Call filterEspecificos when the search input changes

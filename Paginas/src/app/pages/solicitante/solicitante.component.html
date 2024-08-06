@@ -6,6 +6,10 @@
     <input id="Nombre_Solicitante" [(ngModel)]="Nombre_Solicitante" type="text"/>
     <br/>
 
+    <label for="Apellido_Solicitante">Apellido del Solicitante:</label>
+    <input id="Apellido_Solicitante" [(ngModel)]="Apellido_Solicitante" type="text"/>
+    <br/>
+
     <label for="Email">Correo:</label>
     <input id="Email" [(ngModel)]="Email" type="text"/>
     <br/>
@@ -28,7 +32,7 @@
       (click)="selectSolicitante(solicitante)">
     <div class="list-item">
       <div class="item-content">
-        <span class="order">{{ solicitante.IdSolicitante }}</span> {{ solicitante.Nombre_Solicitante }}
+        <span class="order">{{ solicitante.IdSolicitante }}</span> {{ solicitante.Nombre_Solicitante + " "+ solicitante.Apellido_Solicitante }}
         <button class="modify-button" (click)="modificarSolicitante(solicitante)">Modificar
         </button>
         <button class="delete-button" (click)="borrarSolicitante(solicitante.IdSolicitante)">

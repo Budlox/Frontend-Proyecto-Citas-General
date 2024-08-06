@@ -1,1 +1,69 @@
-<p>cita works!</p>
+<br/>
+<br/>
+<div class="container">
+    <!-- Left Panel: Calendar and Search -->
+    <div class="left-panel">
+      <div class="calendar-container">
+        <label for="appointmentDate">Select Appointment Date</label>
+        <input type="date" [(ngModel)]="selectedDate" (change)="onDateChange($event)" [min]="minDate" required/>
+
+      </div>
+  
+      <div class="search-container">
+        <label for="searchInput">Search Applicants</label>
+        <input type="text" id="searchInput" [(ngModel)]="busquedaNombre" (ngModelChange)="onSearchChange()" placeholder="Search by name or surname" />
+      </div>
+      
+      <label for="searchInput">Applicants List</label>
+      <ul class="solicitantes-list">
+        <li *ngFor="let solicitante of SolicitantesFiltrados" (click)="onSelectSolicitante(solicitante)">
+          <div class="solicitante-item">
+            <strong>{{ solicitante.Nombre_Solicitante }} {{ solicitante.Apellido_Solicitante }}</strong>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+        <div>
+            <label for="servicioGeneralFiltro">Filtrar por Servicio General:</label>
+            <select id="servicioGeneralFiltro" [(ngModel)]="ServicioGeneralFiltroSeleccionado" (change)="onSelectServicioGeneralFiltro($event)">
+              <option [value]="null">Seleccione un Servicio General</option>
+              <option *ngFor="let servicio of ServiciosGeneral()" [value]="servicio.IdServicio">
+                {{ servicio.NombreServicio }}
+              </option>
+            </select>
+          </div>
+          
+          <br/>
+          
+          <label for="busquedaNombreServicio">Buscar por nombre:</label>
+          <input id="busquedaNombreServicio" [(ngModel)]="busquedaNombreServicio" (input)="onSearchChangeServicio()" type="text"/>
+          
+          <ul class="solicitantes-list">
+            <li *ngFor="let servicio of EspecificosFiltrados; let i = index; trackBy: trackById" (click)="onSelectServicio(servicio)">
+              <div class="list-item">
+                <div class="item-content">
+                  <span class="order">{{ servicio.IdServicioEspecifico }}</span> {{ servicio.NombreServicioEspecifico }}
+                </div>
+              </div>
+            </li>
+            <li *ngIf="EspecificosFiltrados.length === 0">Nada que mostrar.</li>
+          </ul>
+    </div>
+  
+    <!-- Right Panel: Appointment and Applicant Details -->
+    <div class="right-panel">
+      <h2>Appointment Details</h2>
+      <p *ngIf="selectedSolicitante">
+        <strong>Date:</strong> {{ selectedDate }}<br />
+        <strong>Applicant:</strong> {{ selectedSolicitante.Nombre_Solicitante }} {{ selectedSolicitante.Apellido_Solicitante }}<br />
+        <strong>Email:</strong> {{ selectedSolicitante.Email }}
+      </p>
+      <p *ngIf="selectedServicio">
+        <strong>Service:</strong> {{ selectedServicio.NombreServicioEspecifico }}<br />
+        <strong>Precio:</strong> {{ selectedServicio.CostoServicioEspecifico }}
+      </p>
+      <button (click)="guardarCita()"[disabled]="!selectedServicio || !selectedSolicitante || !selectedDate">Save Appointment</button>
+    </div>
+  </div>

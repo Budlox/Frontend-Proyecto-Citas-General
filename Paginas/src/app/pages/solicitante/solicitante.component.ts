@@ -20,6 +20,7 @@ export class SolicitanteComponent {
   public SolicitanteTemporal: Partial<Solicitante> | null = null; // Temporary storage for solicitante info
 
   public Nombre_Solicitante: string = '';
+  public Apellido_Solicitante: string = '';
   public Email: string = '';
   public Contrasenna: string = '';
   public IdSolicitante: number | null = null;
@@ -84,6 +85,7 @@ public agregarSolicitante(): void {
       if (isValid) {
           let cuerpo: Partial<Solicitante> = {
               Nombre_Solicitante: this.Nombre_Solicitante,
+              Apellido_Solicitante: this.Apellido_Solicitante,
               Email: this.Email,
           };
 
@@ -164,6 +166,7 @@ public modificarSolicitante(solicitante: Solicitante): void {
   this.verificarToken().then(isValid => {
       if (isValid) {
           this.Nombre_Solicitante = solicitante.Nombre_Solicitante;
+          this.Apellido_Solicitante = solicitante.Apellido_Solicitante;
           this.Email = solicitante.Email;
           this.Contrasenna = ''; // Clear the password field
           this.IdSolicitante = solicitante.IdSolicitante ?? null;
@@ -217,6 +220,7 @@ public modificarSolicitante(solicitante: Solicitante): void {
 
   private LimpiarForm(): void {
     this.Nombre_Solicitante = '';
+    this.Apellido_Solicitante = '';
     this.Email = '';
     this.Contrasenna = '';
     this.IdSolicitante = null;

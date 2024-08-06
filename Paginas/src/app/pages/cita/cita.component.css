@@ -1,0 +1,178 @@
+/* Ensure body takes full height and centers content */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: rgb(238, 238, 238); /* Optional background color */
+  }
+  
+  /* Container for both panels */
+  .container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    gap: 20px;
+    background-color: #fff; /* Optional background color */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Full width of the parent */
+    max-width: 1200px; /* Max width to prevent stretching */
+  }
+  
+  /* Panels styling */
+  .left-panel, .right-panel {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex: 1;
+  }
+  
+  .left-panel {
+    max-width: 400px;
+  }
+  
+  .right-panel {
+    max-width: 500px;
+  }
+  
+  h2 {
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  /* Calendar and search container */
+  .calendar-container, .search-container {
+    margin-bottom: 20px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+  }
+  
+  input[type="date"], input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  input[type="text"] {
+    margin-bottom: 20px;
+  }
+  
+  input[type="date"] {
+    margin-bottom: 20px;
+  }
+  
+  /* List styling */
+  .solicitantes-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .solicitantes-list li {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .solicitantes-list li:hover {
+    background-color: #f0f0f0;
+  }
+  
+  /* Item styling */
+  .solicitante-item {
+    font-size: 16px;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* Appointment details */
+  .right-panel p {
+    margin: 10px 0;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  strong {
+    color: #555;
+  }
+  
+  /* Button */
+  button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  button:disabled {
+    background-color: #c0c0c0;
+    cursor: not-allowed;
+  }
+  
+  .container-2 {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .applicant-panel, .appointment-panel {
+    width: 48%;
+  }
+  
+  .applicant-panel input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .applicant-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .applicant-list li {
+    padding: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 5px;
+    cursor: pointer;
+  }
+  
+  .appointment-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .appointment-table th, .appointment-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  .appointment-table th {
+    background-color: #f4f4f4;
+  }
+  
