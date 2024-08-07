@@ -28,6 +28,7 @@ export class CitaComponent {
   public ServiciosGeneral = signal<ServicioGeneral[]>([]);
   public ServiciosEspecifico = signal<ServicioEspecifico[]>([]);
   public citas: Cita[] = [];
+  public servicioEspecificos: ServicioEspecifico[] = [];
   public EspecificosFiltrados: ServicioEspecifico[] = [];
   public ServicioGeneralSeleccionado: number | null = null;
   public ServicioGeneralFiltroSeleccionado: number | null = null;
@@ -50,6 +51,7 @@ export class CitaComponent {
   public busquedaNombre: string = '';
   public busquedaNombre2: string = '';
   public busquedaNombreServicio: string = '';
+  public searchIdServicioEspecifico: number | null = null;
 
   // New properties for combobox and filter
   public filterOptions = ['Past', 'Present', 'Future'];
@@ -226,6 +228,48 @@ export class CitaComponent {
       });
   }
 
+  public getServicioPorIdServicio(IdServicioEspecifico: number | null): void {
+    // Ensure IdServicioEspecifico is defined and valid
+    if (IdServicioEspecifico === null || IdServicioEspecifico === undefined) {
+        console.error('No IdServicioEspecifico provided');
+        return;
+    }
+
+    const headers = this.getAuthHeaders();
+
+    this.http
+      .get<{ Token: string; ServiciosEspecificos: ServicioEspecifico[] }>(
+        `http://localhost/servicioespecifico/${IdServicioEspecifico}`,
+        { headers }
+      )
+      .subscribe({
+        next: (response) => {
+          console.log('API Response:', response);
+
+          // Assign the entire array to servicioEspecificos
+          this.servicioEspecificos = response.ServiciosEspecificos;
+
+          // If you need only the first element, you can handle it here
+          if (this.servicioEspecificos.length > 0) {
+            const firstServicioEspecifico = this.servicioEspecificos[0];
+            this.selectedServicio = this.servicioEspecificos[0]
+            console.log('First Servicio Especifico:', firstServicioEspecifico);
+            // Perform further actions with the first element if needed
+          } else {
+            console.warn('No servicios especificos found');
+          }
+        },
+        error: (error) => {
+          console.error('Error al obtener servicios específicos:', error);
+        },
+      });
+}
+
+
+
+
+  
+
   public onSearchChange(): void {
     const solicitantesArray = this.Solicitantes().Solicitantes;
     if (Array.isArray(solicitantesArray)) {
@@ -286,35 +330,29 @@ export class CitaComponent {
   public guardarCita(): void {
     this.verificarToken().then((isValid) => {
       if (isValid) {
-        // Use selectedDate directly, convert to Costa Rican time zone
-        const selectedDate = new Date(this.selectedDate);
-        const costaRicanOffset = -6 * 60; // UTC-6 in minutes
-        const localSelectedDate = new Date(
-          selectedDate.getTime() + costaRicanOffset * 60000
-        );
-
-        const cuerpo: Partial<Cita> = {
-          FechaCita: localSelectedDate, // Use the date adjusted for Costa Rican time zone
-          IdSolicitante: this.selectedSolicitante?.IdSolicitante ?? 0,
-          Nombre_Cliente: this.selectedSolicitante?.Nombre_Solicitante ?? '',
-          Apellido_Cliente:
-            this.selectedSolicitante?.Apellido_Solicitante ?? '',
-          Correo_Cliente: this.selectedSolicitante?.Email ?? '',
-          IdServicioEspecifico:
-            this.selectedServicio?.IdServicioEspecifico ?? 0,
-        };
-
+        const cuerpo: Partial<Cita> = {};
+  
+        // Use selectedDate directly
+        if (this.selectedDate) {
+          cuerpo.FechaCita = new Date(this.selectedDate);
+        }
+  
+        // Update fields from selectedSolicitante if it exists
+        if (this.selectedSolicitante) {
+          cuerpo.IdSolicitante = this.selectedSolicitante.IdSolicitante;
+          cuerpo.Nombre_Cliente = this.selectedSolicitante.Nombre_Solicitante;
+          cuerpo.Apellido_Cliente = this.selectedSolicitante.Apellido_Solicitante;
+          cuerpo.Correo_Cliente = this.selectedSolicitante.Email;
+        }
+  
+        // Update fields from selectedServicio if it exists
+        if (this.selectedServicio) {
+          cuerpo.IdServicioEspecifico = this.selectedServicio.IdServicioEspecifico;
+        }
+  
         const headers = this.getAuthHeaders();
-
+  
         if (this.selectedCita?.IdCita) {
-          const citaTemporal = this.selectedCita;
-
-          for (const key in cuerpo) {
-            if (cuerpo[key as keyof Cita] === citaTemporal[key as keyof Cita]) {
-              delete cuerpo[key as keyof Cita];
-            }
-          }
-
           this.http
             .put<{ Token: string }>(
               `http://localhost/cita/${this.selectedCita.IdCita}`,
@@ -325,9 +363,10 @@ export class CitaComponent {
               next: (response) => {
                 this.LimpiarForm();
                 this.actualizarToken(response.Token);
+                console.log('Quote updated successfully');
               },
               error: (error) => {
-                console.error('Error updating appointment:', error);
+                console.error('Error updating quote:', error);
               },
             });
         } else {
@@ -341,18 +380,19 @@ export class CitaComponent {
               next: (response) => {
                 this.LimpiarForm();
                 this.actualizarToken(response.Token);
+                console.log('Quote added successfully');
               },
               error: (error) => {
-                console.error('Error adding appointment:', error);
+                console.error('Error adding quote:', error);
               },
             });
         }
       } else {
-        console.error('Token inválido al agregar/actualizar cita');
+        console.error('Invalid token while adding/updating quote');
       }
     });
   }
-
+  
   private LimpiarForm(): void {
     this.ServicioGeneralSeleccionado = null;
     this.ServicioGeneralFiltroSeleccionado = null;
@@ -367,6 +407,8 @@ export class CitaComponent {
     this.IdServicioEspecifico = null;
     this.IdSolicitante = null;
     this.EspecificosFiltrados = [];
+    this.busquedaNombre = "";
+    this.refreshCitas();
   }
 
   private actualizarToken(token: string): void {
@@ -461,11 +503,33 @@ export class CitaComponent {
       this.IdSolicitante = appointment.IdSolicitante;
   
       // Populate the search input with the client name
-      this.busquedaNombre = appointment.Nombre_Cliente + " " + appointment.Apellido_Cliente;
+      this.busquedaNombre = appointment.Nombre_Cliente;
   
       // Find and set the selected applicant, defaulting to null if not found
       this.selectedSolicitante = this.SolicitantesFiltrados.find(applicant => applicant.IdSolicitante === appointment.IdSolicitante) || null;
-      console.log("Solicitante: ", this.selectedSolicitante)
+      const serviciosEspecificos = this.ServiciosEspecifico();
+      // Find the specific service in FilterSpecifics
+      const specificService = serviciosEspecificos.find(service => service.IdServicioEspecifico === appointment.IdServicioEspecifico);
+      
+      if (specificService) {
+        // Ensure IdServicioEspecifico is a number or null
+        this.IdServicioEspecifico = specificService.IdServicioEspecifico ?? null;
+        
+        // Find and set the corresponding general service
+        const generalService = this.ServiciosGeneral().find(service => service.IdServicio === specificService.IdServicio);
+        
+        if (generalService) {
+          // Set the selected general service in the dropdown
+          this.ServicioGeneralFiltroSeleccionado = specificService.IdServicio ?? null;
+          this.filterEspecificos();
+          this.getServicioPorIdServicio(this.IdServicioEspecifico as number);
+        } else {
+          console.error('General Service not found!');
+        }
+      } else {
+        console.error('Specific Service not found!');
+      }
+  
       // Optionally, you might want to set the selectedAppointment to the current appointment
       this.selectedCita = appointment;
   
@@ -476,11 +540,6 @@ export class CitaComponent {
     }
   }
   
-  
-  
-  
-  
-
   public onDeleteCita(idCita: number): void {
     const headers = this.getAuthHeaders();
     this.http.delete(`http://localhost/cita/${idCita}`, { headers }).subscribe({
