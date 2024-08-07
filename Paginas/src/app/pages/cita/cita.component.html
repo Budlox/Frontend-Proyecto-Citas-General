@@ -1,69 +1,210 @@
-<br/>
-<br/>
+<br />
+<br />
 <div class="container">
-    <!-- Left Panel: Calendar and Search -->
-    <div class="left-panel">
-      <div class="calendar-container">
-        <label for="appointmentDate">Select Appointment Date</label>
-        <input type="date" [(ngModel)]="selectedDate" (change)="onDateChange($event)" [min]="minDate" required/>
+  <!-- Title for the First Container -->
+  <h1>Schedule Appointment</h1>
 
-      </div>
-  
-      <div class="search-container">
-        <label for="searchInput">Search Applicants</label>
-        <input type="text" id="searchInput" [(ngModel)]="busquedaNombre" (ngModelChange)="onSearchChange()" placeholder="Search by name or surname" />
-      </div>
-      
-      <label for="searchInput">Applicants List</label>
-      <ul class="solicitantes-list">
-        <li *ngFor="let solicitante of SolicitantesFiltrados" (click)="onSelectSolicitante(solicitante)">
-          <div class="solicitante-item">
-            <strong>{{ solicitante.Nombre_Solicitante }} {{ solicitante.Apellido_Solicitante }}</strong>
-          </div>
-        </li>
-      </ul>
+  <!-- Left Panel: Calendar and Search -->
+  <div class="left-panel">
+    <div class="calendar-container">
+      <label for="appointmentDate">Select Appointment Date</label>
+      <input
+        type="date"
+        [(ngModel)]="selectedDate"
+        (change)="onDateChange($event)"
+        [min]="minDate"
+        required
+      />
     </div>
 
+    <div class="search-container">
+      <label for="searchInput">Search Applicants</label>
+      <input
+        type="text"
+        id="searchInput"
+        [(ngModel)]="busquedaNombre"
+        (ngModelChange)="onSearchChange()"
+        placeholder="Search by name or surname"
+      />
+    </div>
+
+    <label for="searchInput">Applicants List</label>
+    <ul class="solicitantes-list">
+      <li
+        *ngFor="let solicitante of SolicitantesFiltrados"
+        (click)="onSelectSolicitante(solicitante)"
+      >
+        <div class="solicitante-item">
+          <strong
+            >{{ solicitante.Nombre_Solicitante }}
+            {{ solicitante.Apellido_Solicitante }}</strong
+          >
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div>
     <div>
-        <div>
-            <label for="servicioGeneralFiltro">Filtrar por Servicio General:</label>
-            <select id="servicioGeneralFiltro" [(ngModel)]="ServicioGeneralFiltroSeleccionado" (change)="onSelectServicioGeneralFiltro($event)">
-              <option [value]="null">Seleccione un Servicio General</option>
-              <option *ngFor="let servicio of ServiciosGeneral()" [value]="servicio.IdServicio">
-                {{ servicio.NombreServicio }}
-              </option>
-            </select>
-          </div>
-          
-          <br/>
-          
-          <label for="busquedaNombreServicio">Buscar por nombre:</label>
-          <input id="busquedaNombreServicio" [(ngModel)]="busquedaNombreServicio" (input)="onSearchChangeServicio()" type="text"/>
-          
-          <ul class="solicitantes-list">
-            <li *ngFor="let servicio of EspecificosFiltrados; let i = index; trackBy: trackById" (click)="onSelectServicio(servicio)">
-              <div class="list-item">
-                <div class="item-content">
-                  <span class="order">{{ servicio.IdServicioEspecifico }}</span> {{ servicio.NombreServicioEspecifico }}
-                </div>
-              </div>
-            </li>
-            <li *ngIf="EspecificosFiltrados.length === 0">Nada que mostrar.</li>
-          </ul>
+      <label for="servicioGeneralFiltro">Filtrar por Servicio General:</label>
+      <select
+        id="servicioGeneralFiltro"
+        [(ngModel)]="ServicioGeneralFiltroSeleccionado"
+        (change)="onSelectServicioGeneralFiltro($event)"
+      >
+        <option [value]="null">Seleccione un Servicio General</option>
+        <option
+          *ngFor="let servicio of ServiciosGeneral()"
+          [value]="servicio.IdServicio"
+        >
+          {{ servicio.NombreServicio }}
+        </option>
+      </select>
     </div>
-  
-    <!-- Right Panel: Appointment and Applicant Details -->
-    <div class="right-panel">
-      <h2>Appointment Details</h2>
-      <p *ngIf="selectedSolicitante">
-        <strong>Date:</strong> {{ selectedDate }}<br />
-        <strong>Applicant:</strong> {{ selectedSolicitante.Nombre_Solicitante }} {{ selectedSolicitante.Apellido_Solicitante }}<br />
-        <strong>Email:</strong> {{ selectedSolicitante.Email }}
-      </p>
-      <p *ngIf="selectedServicio">
-        <strong>Service:</strong> {{ selectedServicio.NombreServicioEspecifico }}<br />
-        <strong>Precio:</strong> {{ selectedServicio.CostoServicioEspecifico }}
-      </p>
-      <button (click)="guardarCita()"[disabled]="!selectedServicio || !selectedSolicitante || !selectedDate">Save Appointment</button>
+
+    <br />
+
+    <label for="busquedaNombreServicio">Buscar por nombre:</label>
+    <input
+      id="busquedaNombreServicio"
+      [(ngModel)]="busquedaNombreServicio"
+      (input)="onSearchChangeServicio()"
+      type="text"
+    />
+
+    <ul class="solicitantes-list">
+      <li
+        *ngFor="
+          let servicio of EspecificosFiltrados;
+          let i = index;
+          trackBy: trackById
+        "
+        (click)="onSelectServicio(servicio)"
+      >
+        <div class="list-item">
+          <div class="item-content">
+            <span class="order">{{ servicio.IdServicioEspecifico }}</span>
+            {{ servicio.NombreServicioEspecifico }}
+          </div>
+        </div>
+      </li>
+      <li *ngIf="EspecificosFiltrados.length === 0">Nada que mostrar.</li>
+    </ul>
+  </div>
+
+  <!-- Right Panel: Appointment and Applicant Details -->
+  <div class="right-panel">
+    <h2>Appointment Details</h2>
+    <p *ngIf="selectedSolicitante">
+      <strong>Date:</strong> {{ selectedDate }}<br />
+      <strong>Applicant:</strong> {{ selectedSolicitante.Nombre_Solicitante }}
+      {{ selectedSolicitante.Apellido_Solicitante }}<br />
+      <strong>Email:</strong> {{ selectedSolicitante.Email }}
+    </p>
+    <p *ngIf="selectedServicio">
+      <strong>Service:</strong> {{ selectedServicio.NombreServicioEspecifico
+      }}<br />
+      <strong>Precio:</strong> {{ selectedServicio.CostoServicioEspecifico }}
+    </p>
+    <button
+      (click)="guardarCita()"
+      [disabled]="!selectedServicio || !selectedSolicitante || !selectedDate"
+    >
+      Save Appointment
+    </button>
+  </div>
+</div>
+
+<!-- Title for the Second Container -->
+<div class="second-container">
+  <h1>Modify Appointment</h1>
+
+  <!-- Left Side: Search and Applicants List -->
+  <div class="left-panel">
+    <div class="search-container">
+      <label for="searchInput">Search Applicants</label>
+      <input
+        type="text"
+        id="searchInput"
+        [(ngModel)]="busquedaNombre2"
+        (ngModelChange)="onSearchChange2()"
+        placeholder="Search by name or surname"
+      />
+    </div>
+
+    <label for="searchInput">Applicants List</label>
+    <ul class="solicitantes-list">
+      <li
+        *ngFor="let solicitante of SolicitantesFiltrados2"
+        (click)="onSelectSolicitante2(solicitante)"
+        [ngClass]="{ 'selected-item': selectedSolicitante === solicitante }"
+      >
+        <div class="solicitante-item">
+          <strong
+            >{{ solicitante.Nombre_Solicitante }}
+            {{ solicitante.Apellido_Solicitante }}</strong
+          >
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Right Side: Combobox and Data Table -->
+  <div class="right-panel">
+    <div class="filter-container">
+      <label for="filterComboBox">Filter by Criteria:</label>
+      <select
+        id="filterComboBox"
+        [(ngModel)]="filterComboBoxValue"
+        (change)="onFilterComboBoxChange($event)"
+      >
+        <option *ngFor="let option of filterOptions" [value]="option">
+          {{ option }}
+        </option>
+      </select>
+    </div>
+
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Details</th>
+            <th
+              *ngIf="
+                filterComboBoxValue === 'Present' ||
+                filterComboBoxValue === 'Future'
+              "
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredItems">
+            <td>{{ item.id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.details }}</td>
+            <td
+              *ngIf="
+                filterComboBoxValue === 'Present' ||
+                filterComboBoxValue === 'Future'
+              "
+            >
+              <button class="modify-button" (click)="onModify(item.id)">
+                Modify
+              </button>
+              <button class="delete-button" (click)="onDeleteCita(item.id)">
+                Delete
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredItems.length === 0">
+            <td colspan="4">No items to show.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
+</div>

@@ -80,16 +80,17 @@ body {
   
   .solicitantes-list li {
     padding: 10px;
-    margin-bottom: 10px;
-    background-color: #fff;
-    border: 1px solid #ddd;
+    margin: 5px 0;
     border-radius: 4px;
+    background-color: #fff;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   
   .solicitantes-list li:hover {
     background-color: #f0f0f0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
   
   /* Item styling */
@@ -99,6 +100,12 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .selected-item {
+    background-color: #007bff;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
   
   /* Appointment details */
@@ -176,3 +183,88 @@ body {
     background-color: #f4f4f4;
   }
   
+  /* Add to your CSS file */
+
+.second-container {
+  display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    gap: 20px;
+    background-color: #fff; /* Optional background color */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Full width of the parent */
+    max-width: 1200px; /* Max width to prevent stretching */
+}
+
+.search-container {
+  margin-bottom: 15px;
+}
+
+.table-container {
+  margin-top: 15px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.data-table th {
+  background-color: #f2f2f2;
+}
+
+.data-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.data-table tr:hover {
+  background-color: #ddd;
+}
+
+.data-table td {
+  white-space: nowrap; /* Prevent text wrapping in table cells */
+}
+
+/* General Button Styling */
+button {
+  padding: 5px 10px;
+  margin-right: 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+/* Modify Button Styling */
+button.modify-button {
+  background-color: #007bff; /* Blue color */
+  color: white;
+}
+
+button.modify-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Delete Button Styling */
+button.delete-button {
+  background-color: #dc3545; /* Red color */
+  color: white;
+}
+
+button.delete-button:hover {
+  background-color: #c82333; /* Darker red on hover */
+}
+
+button:disabled {
+  background-color: #c0c0c0;
+  cursor: not-allowed;
+}
+
