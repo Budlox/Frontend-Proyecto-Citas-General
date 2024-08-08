@@ -173,8 +173,8 @@
             <th>Detalle</th>
             <th
               *ngIf="
-                filterComboBoxValue === 'Present' ||
-                filterComboBoxValue === 'Future'
+                filterComboBoxValue === 'Presente' ||
+                filterComboBoxValue === 'Futuro'
               "
             >
               Acciones
@@ -188,8 +188,8 @@
             <td>{{ item.details }}</td>
             <td
               *ngIf="
-                filterComboBoxValue === 'Present' ||
-                filterComboBoxValue === 'Future'
+                filterComboBoxValue === 'Presente' ||
+                filterComboBoxValue === 'Futuro'
               "
             >
               <button class="modify-button" (click)="onModify(item.id)">

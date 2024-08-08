@@ -54,8 +54,8 @@ export class CitaComponent {
   public searchIdServicioEspecifico: number | null = null;
 
   // New properties for combobox and filter
-  public filterOptions = ['Past', 'Present', 'Future'];
-  public filterComboBoxValue: string = 'Present';
+  public filterOptions = ['Pasado', 'Presente', 'Futuro'];
+  public filterComboBoxValue: string = 'Presente';
   public filteredItems: { id: number; name: string; details: string }[] = [];
   public busquedaNombreFiltro: string = '';
 
@@ -463,11 +463,11 @@ export class CitaComponent {
         }
 
         switch (this.filterComboBoxValue) {
-          case 'Past':
+          case 'Pasado':
             return localCitaDate < startOfDay;
-          case 'Present':
+          case 'Presente':
             return localCitaDate >= startOfDay && localCitaDate <= endOfDay;
-          case 'Future':
+          case 'Futuro':
             return localCitaDate > endOfDay;
           default:
             return true;
