@@ -2,12 +2,12 @@
 <br />
 <div class="container">
   <!-- Title for the First Container -->
-  <h1>Schedule Appointment</h1>
+  <h1>Agendar Cita</h1>
 
   <!-- Left Panel: Calendar and Search -->
   <div class="left-panel">
     <div class="calendar-container">
-      <label for="appointmentDate">Select Appointment Date</label>
+      <label for="appointmentDate">Seleccionar Fecha</label>
       <input
         type="date"
         [(ngModel)]="selectedDate"
@@ -18,17 +18,17 @@
     </div>
 
     <div class="search-container">
-      <label for="searchInput">Search Applicants</label>
+      <label for="searchInput">Buscar Solicitantes</label>
       <input
         type="text"
         id="searchInput"
         [(ngModel)]="busquedaNombre"
         (ngModelChange)="onSearchChange()"
-        placeholder="Search by name or surname"
+        placeholder="Buscar por nombre o apellido"
       />
     </div>
 
-    <label for="searchInput">Applicants List</label>
+    <label for="searchInput">Lista de solicitantes</label>
     <ul class="solicitantes-list">
       <li
         *ngFor="let solicitante of SolicitantesFiltrados"
@@ -94,15 +94,15 @@
 
   <!-- Right Panel: Appointment and Applicant Details -->
   <div class="right-panel">
-    <h2>Appointment Details</h2>
+    <h2>Detalles de la cita</h2>
     <p *ngIf="selectedSolicitante">
-      <strong>Date:</strong> {{ selectedDate }}<br />
-      <strong>Applicant:</strong> {{ selectedSolicitante.Nombre_Solicitante }}
+      <strong>Fecha:</strong> {{ selectedDate }}<br />
+      <strong>Solicitante:</strong> {{ selectedSolicitante.Nombre_Solicitante }}
       {{ selectedSolicitante.Apellido_Solicitante }}<br />
       <strong>Email:</strong> {{ selectedSolicitante.Email }}
     </p>
     <p *ngIf="selectedServicio">
-      <strong>Service:</strong> {{ selectedServicio.NombreServicioEspecifico
+      <strong>Servicio:</strong> {{ selectedServicio.NombreServicioEspecifico
       }}<br />
       <strong>Precio:</strong> {{ selectedServicio.CostoServicioEspecifico }}
     </p>
@@ -110,29 +110,29 @@
       (click)="guardarCita()"
       [disabled]="!selectedServicio || !selectedSolicitante || !selectedDate"
     >
-      Save Appointment
+      Guardar Cita
     </button>
   </div>
 </div>
 
 <!-- Title for the Second Container -->
 <div class="second-container">
-  <h1>Modify Appointment</h1>
+  <h1>Modificar Cita</h1>
 
   <!-- Left Side: Search and Applicants List -->
   <div class="left-panel">
     <div class="search-container">
-      <label for="searchInput">Search Applicants</label>
+      <label for="searchInput">Buscar Solicitante</label>
       <input
         type="text"
         id="searchInput"
         [(ngModel)]="busquedaNombre2"
         (ngModelChange)="onSearchChange2()"
-        placeholder="Search by name or surname"
+        placeholder="Buscar por nombre y apellido"
       />
     </div>
 
-    <label for="searchInput">Applicants List</label>
+    <label for="searchInput">Lista Solicitantes</label>
     <ul class="solicitantes-list">
       <li
         *ngFor="let solicitante of SolicitantesFiltrados2"
@@ -152,7 +152,7 @@
   <!-- Right Side: Combobox and Data Table -->
   <div class="right-panel">
     <div class="filter-container">
-      <label for="filterComboBox">Filter by Criteria:</label>
+      <label for="filterComboBox">Filtrar por Criterio:</label>
       <select
         id="filterComboBox"
         [(ngModel)]="filterComboBoxValue"
@@ -168,16 +168,16 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Details</th>
+            <th>No. Cita</th>
+            <th>Nombre</th>
+            <th>Detalle</th>
             <th
               *ngIf="
                 filterComboBoxValue === 'Present' ||
                 filterComboBoxValue === 'Future'
               "
             >
-              Actions
+              Acciones
             </th>
           </tr>
         </thead>
@@ -193,15 +193,15 @@
               "
             >
               <button class="modify-button" (click)="onModify(item.id)">
-                Modify
+                Modificar
               </button>
               <button class="delete-button" (click)="onDeleteCita(item.id)">
-                Delete
+                Eliminar
               </button>
             </td>
           </tr>
           <tr *ngIf="filteredItems.length === 0">
-            <td colspan="4">No items to show.</td>
+            <td colspan="4">No hay nada que mostrar.</td>
           </tr>
         </tbody>
       </table>
