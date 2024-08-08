@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [JsonPipe, FormsModule, CommonModule],
   templateUrl: './servicioespecifico.component.html',
-  styleUrls: ['./servicioespecifico.component.css']
+  styleUrls: ['./servicioespecifico.component.css'],
 })
 export class ServicioespecificoComponent {
   public Titulo = 'Administración de Servicios Específicos';
@@ -33,11 +33,10 @@ export class ServicioespecificoComponent {
   }
 
   private verificarTokenYcargarDatos() {
-    this.verificarToken().then(isValid => {
+    this.verificarToken().then((isValid) => {
       if (isValid) {
         this.metodoGETServicioGeneral();
         this.metodoGETServicioEspecifico();
-
       } else {
         this.router.navigate(['/login']);
       }
@@ -48,13 +47,14 @@ export class ServicioespecificoComponent {
     const token = localStorage.getItem('token');
     console.log('Token:', token); // Verificar el token
     return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     });
   }
 
   private verificarToken(): Promise<boolean> {
     const headers = this.getAuthHeaders();
-    return this.http.post<boolean>('http://localhost/usuario/validartoken', {}, { headers })
+    return this.http
+      .post<boolean>('http://localhost/usuario/validartoken', {}, { headers })
       .toPromise()
       .then(() => true)
       .catch(() => false);
@@ -62,7 +62,11 @@ export class ServicioespecificoComponent {
 
   public metodoGETServicioGeneral() {
     const headers = this.getAuthHeaders();
-    this.http.get<{ ServiciosGenerales: ServicioGeneral[] }>('http://localhost/serviciogeneral', { headers })
+    this.http
+      .get<{ ServiciosGenerales: ServicioGeneral[] }>(
+        'http://localhost/serviciogeneral',
+        { headers }
+      )
       .subscribe({
         next: (response) => {
           console.log('ServiciosGenerales recibidos:', response); // Verificar los datos recibidos
@@ -70,14 +74,18 @@ export class ServicioespecificoComponent {
         },
         error: (error) => {
           console.error('Error al obtener servicios:', error);
-        }
+        },
       });
   }
 
   //Ajustar los servicios especificos (la respuesta)
   public metodoGETServicioEspecifico() {
     const headers = this.getAuthHeaders();
-    this.http.get<{ ServiciosEspecificos: ServicioEspecifico[] }>('http://localhost/servicioespecifico', { headers })
+    this.http
+      .get<{ ServiciosEspecificos: ServicioEspecifico[] }>(
+        'http://localhost/servicioespecifico',
+        { headers }
+      )
       .subscribe({
         next: (response) => {
           this.ServiciosEspecifico.set(response.ServiciosEspecificos);
@@ -86,10 +94,9 @@ export class ServicioespecificoComponent {
         },
         error: (error) => {
           console.error('Error al obtener servicios específicos:', error);
-        }
+        },
       });
   }
-
 
   public onSelectServicioGeneral(event: Event): void {
     const target = event.target as HTMLSelectElement;
@@ -106,14 +113,18 @@ export class ServicioespecificoComponent {
     const serviciosEspecificos = this.ServiciosEspecifico(); // Obtener el valor actual del signal
     if (this.ServicioGeneralFiltroSeleccionado) {
       this.EspecificosFiltrados = serviciosEspecificos.filter(
-        s => s.IdServicio === this.ServicioGeneralFiltroSeleccionado &&
-             (this.busquedaNombre ? s.NombreServicioEspecifico.toLowerCase().includes(this.busquedaNombre.toLowerCase()) : true)
+        (s) =>
+          s.IdServicio === this.ServicioGeneralFiltroSeleccionado &&
+          (this.busquedaNombre
+            ? s.NombreServicioEspecifico.toLowerCase().includes(
+                this.busquedaNombre.toLowerCase()
+              )
+            : true)
       );
     } else {
       this.EspecificosFiltrados = [];
     }
   }
-  
 
   public onSearchChange(): void {
     // Call filterEspecificos when the search input changes
@@ -121,56 +132,72 @@ export class ServicioespecificoComponent {
   }
 
   public guardarServicioEspecifico(): void {
-    this.verificarToken().then(isValid => {
-        if (isValid) {
-            if (this.ServicioGeneralSeleccionado && this.NombreServicioEspecifico && this.CostoServicioEspecifico) {
-                const servicioEspecifico: ServicioEspecifico = {
-                    IdServicioEspecifico: this.IdServicioEspecifico ?? 0, // Use the existing ID or 0 for new entries
-                    NombreServicioEspecifico: this.NombreServicioEspecifico,
-                    CostoServicioEspecifico: this.CostoServicioEspecifico,
-                    IdServicio: this.ServicioGeneralSeleccionado,
-                };
+    this.verificarToken().then((isValid) => {
+      if (isValid) {
+        if (
+          this.ServicioGeneralSeleccionado &&
+          this.NombreServicioEspecifico &&
+          this.CostoServicioEspecifico
+        ) {
+          const servicioEspecifico: ServicioEspecifico = {
+            IdServicioEspecifico: this.IdServicioEspecifico ?? 0, // Use the existing ID or 0 for new entries
+            NombreServicioEspecifico: this.NombreServicioEspecifico,
+            CostoServicioEspecifico: this.CostoServicioEspecifico,
+            IdServicio: this.ServicioGeneralSeleccionado,
+          };
 
-                const headers = this.getAuthHeaders();
+          const headers = this.getAuthHeaders();
 
-                if (this.IdServicioEspecifico) {
-                    // Update existing service
-                    this.http.put<{ Token: string }>(`http://localhost/servicioespecifico/${this.IdServicioEspecifico}`, servicioEspecifico, { headers })
-                        .subscribe({
-                            next: (response) => {
-                                console.log('Servicio específico actualizado', response);
-                                this.metodoGETServicioEspecifico(); // Refresh the list
-                                this.resetForm();
-                                this.actualizarToken(response.Token);
-                            },
-                            error: (error) => {
-                                console.error('Error al actualizar servicio específico', error);
-                            }
-                        });
-                } else {
-                    // Create new service
-                    this.http.post<{ Token: string }>('http://localhost/servicioespecifico', servicioEspecifico, { headers })
-                        .subscribe({
-                            next: (response) => {
-                                console.log('Servicio específico agregado', response);
-                                this.metodoGETServicioEspecifico(); // Refresh the list
-                                this.resetForm();
-                                this.actualizarToken(response.Token);
-                            },
-                            error: (error) => {
-                                console.error('Error al agregar servicio específico', error);
-                            }
-                        });
-                }
-            } else {
-                alert('Por favor complete todos los campos');
-            }
+          if (this.IdServicioEspecifico) {
+            // Update existing service
+            this.http
+              .put<{ Token: string }>(
+                `http://localhost/servicioespecifico/${this.IdServicioEspecifico}`,
+                servicioEspecifico,
+                { headers }
+              )
+              .subscribe({
+                next: (response) => {
+                  console.log('Servicio específico actualizado', response);
+                  this.metodoGETServicioEspecifico(); // Refresh the list
+                  this.resetForm();
+                  this.actualizarToken(response.Token);
+                },
+                error: (error) => {
+                  console.error(
+                    'Error al actualizar servicio específico',
+                    error
+                  );
+                },
+              });
+          } else {
+            // Create new service
+            this.http
+              .post<{ Token: string }>(
+                'http://localhost/servicioespecifico',
+                servicioEspecifico,
+                { headers }
+              )
+              .subscribe({
+                next: (response) => {
+                  console.log('Servicio específico agregado', response);
+                  this.metodoGETServicioEspecifico(); // Refresh the list
+                  this.resetForm();
+                  this.actualizarToken(response.Token);
+                },
+                error: (error) => {
+                  console.error('Error al agregar servicio específico', error);
+                },
+              });
+          }
         } else {
-            this.router.navigate(['/login']);
+          alert('Por favor complete todos los campos');
         }
+      } else {
+        this.router.navigate(['/login']);
+      }
     });
-} 
-
+  }
 
   private resetForm(): void {
     this.NombreServicioEspecifico = '';
@@ -182,49 +209,52 @@ export class ServicioespecificoComponent {
   }
 
   public modificarServicioEspecifico(servicio: ServicioEspecifico): void {
-    this.verificarToken().then(isValid => {
-        if (isValid) {
-            this.NombreServicioEspecifico = servicio.NombreServicioEspecifico;
-            this.CostoServicioEspecifico = servicio.CostoServicioEspecifico;
-            this.IdServicioEspecifico = servicio.IdServicioEspecifico ?? null;
-            this.ServicioGeneralSeleccionado = servicio.IdServicio;
+    this.verificarToken().then((isValid) => {
+      if (isValid) {
+        this.NombreServicioEspecifico = servicio.NombreServicioEspecifico;
+        this.CostoServicioEspecifico = servicio.CostoServicioEspecifico;
+        this.IdServicioEspecifico = servicio.IdServicioEspecifico ?? null;
+        this.ServicioGeneralSeleccionado = servicio.IdServicio;
 
-            // Optionally, you can set the selected ServicioGeneral in the filter combobox
-            this.ServicioGeneralFiltroSeleccionado = servicio.IdServicio;
-        } else {
-            this.router.navigate(['/login']);
-        }
+        // Optionally, you can set the selected ServicioGeneral in the filter combobox
+        this.ServicioGeneralFiltroSeleccionado = servicio.IdServicio;
+      } else {
+        this.router.navigate(['/login']);
+      }
     });
-}
+  }
 
   public borrarServicioEspecifico(IdServicioEspecifico: any): void {
-    this.verificarToken().then(isValid => {
-        if (isValid) {
-            const headers = this.getAuthHeaders();
-            this.http.delete<{ Token: string }>(`http://localhost/servicioespecifico/${IdServicioEspecifico}`, { headers })
-                .subscribe({
-                    next: (response) => {
-                        this.metodoGETServicioEspecifico(); // Refresh the list after deletion
-                        this.actualizarToken(response.Token);
-                        this.resetForm();
-                    },
-                    error: (error) => {
-                        console.error('Error al borrar servicio específico:', error);
-                        this.router.navigate(['/login']);
-                    }
-                });
-        } else {
-            this.router.navigate(['/login']);
-        }
+    this.verificarToken().then((isValid) => {
+      if (isValid) {
+        const headers = this.getAuthHeaders();
+        this.http
+          .delete<{ Token: string }>(
+            `http://localhost/servicioespecifico/${IdServicioEspecifico}`,
+            { headers }
+          )
+          .subscribe({
+            next: (response) => {
+              this.metodoGETServicioEspecifico(); // Refresh the list after deletion
+              this.actualizarToken(response.Token);
+              this.resetForm();
+            },
+            error: (error) => {
+              console.error('Error al borrar servicio específico:', error);
+              this.router.navigate(['/login']);
+            },
+          });
+      } else {
+        this.router.navigate(['/login']);
+      }
     });
-}
+  }
 
-public trackById(index: number, servicio: ServicioEspecifico): number {
+  public trackById(index: number, servicio: ServicioEspecifico): number {
     return servicio.IdServicioEspecifico!;
-}
+  }
 
-private actualizarToken(token: string): void {
+  private actualizarToken(token: string): void {
     localStorage.setItem('token', token);
-}
-
+  }
 }

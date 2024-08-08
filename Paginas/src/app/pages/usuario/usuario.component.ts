@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [JsonPipe, FormsModule, CommonModule],
   templateUrl: './usuario.component.html',
-  styleUrls: ['./usuario.component.css']
+  styleUrls: ['./usuario.component.css'],
 })
 export class UsuarioComponent {
   public Titulo = 'Administración de Usuarios';
@@ -37,20 +37,21 @@ export class UsuarioComponent {
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
     return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     });
   }
 
   private verificarToken(): Promise<boolean> {
     const headers = this.getAuthHeaders();
-    return this.http.post<boolean>('http://localhost/usuario/validartoken', {}, { headers })
+    return this.http
+      .post<boolean>('http://localhost/usuario/validartoken', {}, { headers })
       .toPromise()
       .then(() => true)
       .catch(() => false);
   }
 
   private verificarTokenYcargarDatos() {
-    this.verificarToken().then(isValid => {
+    this.verificarToken().then((isValid) => {
       if (isValid) {
         this.metodoGETUsuario();
       } else {
@@ -60,10 +61,14 @@ export class UsuarioComponent {
   }
 
   public metodoGETUsuario(): void {
-    this.verificarToken().then(isValid => {
+    this.verificarToken().then((isValid) => {
       if (isValid) {
         const headers = this.getAuthHeaders();
-        this.http.get<{ Token: string; Usuarios: Usuario[] }>('http://localhost/usuario', { headers })
+        this.http
+          .get<{ Token: string; Usuarios: Usuario[] }>(
+            'http://localhost/usuario',
+            { headers }
+          )
           .subscribe({
             next: (response) => {
               // Actualizar la lista de usuarios con los datos recibidos
@@ -73,7 +78,7 @@ export class UsuarioComponent {
             error: (error) => {
               console.error('Error al obtener usuarios:', error);
               this.router.navigate(['/login']); // Redirigir al login si ocurre un error
-            }
+            },
           });
       } else {
         console.error('Token inválido al obtener usuarios');
@@ -83,7 +88,7 @@ export class UsuarioComponent {
   }
 
   public agregarUsuario(): void {
-    this.verificarToken().then(isValid => {
+    this.verificarToken().then((isValid) => {
       if (isValid) {
         const cuerpo: Partial<Usuario> = {
           NombreUsuario: this.nombreUsuario,
@@ -100,11 +105,18 @@ export class UsuarioComponent {
 
         if (this.IdUsuario) {
           // Update existing user
-          this.http.put<Usuario>(`http://localhost/usuario/${this.IdUsuario}`, cuerpo, { headers })
+          this.http
+            .put<Usuario>(
+              `http://localhost/usuario/${this.IdUsuario}`,
+              cuerpo,
+              { headers }
+            )
             .subscribe({
               next: (usuarioActualizado) => {
                 this.Usuarios = this.Usuarios.map((usuario) =>
-                  usuario.IdUsuario === this.IdUsuario ? { ...usuario, ...cuerpo } : usuario
+                  usuario.IdUsuario === this.IdUsuario
+                    ? { ...usuario, ...cuerpo }
+                    : usuario
                 );
                 this.LimpiarForm();
                 this.actualizarToken(usuarioActualizado.Token);
@@ -112,11 +124,16 @@ export class UsuarioComponent {
               error: (error) => {
                 console.error('Error updating user:', error);
                 this.router.navigate(['/login']);
-              }
+              },
             });
         } else {
           // Create new user
-          this.http.post<{Usuario: Usuario, Token: string}>('http://localhost/usuario', cuerpo, { headers })
+          this.http
+            .post<{ Usuario: Usuario; Token: string }>(
+              'http://localhost/usuario',
+              cuerpo,
+              { headers }
+            )
             .subscribe({
               next: (response) => {
                 this.Usuarios = [...this.Usuarios, response.Usuario];
@@ -126,7 +143,7 @@ export class UsuarioComponent {
               error: (error) => {
                 console.error('Error adding user:', error);
                 this.router.navigate(['/login']);
-              }
+              },
             });
         }
       } else {
@@ -136,19 +153,24 @@ export class UsuarioComponent {
   }
 
   public borrarUsuario(Id: number): void {
-    this.verificarToken().then(isValid => {
+    this.verificarToken().then((isValid) => {
       if (isValid) {
         const headers = this.getAuthHeaders();
-        this.http.delete<{ Token: string }>(`http://localhost/usuario/${Id}`, { headers })
+        this.http
+          .delete<{ Token: string }>(`http://localhost/usuario/${Id}`, {
+            headers,
+          })
           .subscribe({
             next: (response) => {
-              this.Usuarios = this.Usuarios.filter((usuario) => usuario.IdUsuario !== Id);
+              this.Usuarios = this.Usuarios.filter(
+                (usuario) => usuario.IdUsuario !== Id
+              );
               this.actualizarToken(response.Token);
             },
             error: (error) => {
               console.error('Error deleting user:', error);
               this.router.navigate(['/login']);
-            }
+            },
           });
       } else {
         this.router.navigate(['/login']);
@@ -161,7 +183,7 @@ export class UsuarioComponent {
   }
 
   public modificarUsuario(usuario: Usuario): void {
-    this.verificarToken().then(isValid => {
+    this.verificarToken().then((isValid) => {
       if (isValid) {
         this.nombreUsuario = usuario.NombreUsuario;
         this.email = usuario.Email;

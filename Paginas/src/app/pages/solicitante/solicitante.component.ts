@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [JsonPipe, FormsModule, CommonModule],
   templateUrl: './solicitante.component.html',
-  styleUrls: ['./solicitante.component.css']
+  styleUrls: ['./solicitante.component.css'],
 })
 export class SolicitanteComponent {
   public Titulo = 'Administración de Solicitante';
@@ -36,20 +36,21 @@ export class SolicitanteComponent {
     const token = localStorage.getItem('token');
     console.log('Token:', token); // Verificar el token
     return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     });
   }
 
   private verificarToken(): Promise<boolean> {
     const headers = this.getAuthHeaders();
-    return this.http.post<boolean>('http://localhost/usuario/validartoken', {}, { headers })
+    return this.http
+      .post<boolean>('http://localhost/usuario/validartoken', {}, { headers })
       .toPromise()
       .then(() => true)
       .catch(() => false);
   }
 
   private verificarTokenYcargarDatos() {
-    this.verificarToken().then(isValid => {
+    this.verificarToken().then((isValid) => {
       if (isValid) {
         this.metodoGETSolicitante();
       } else {
@@ -59,123 +60,149 @@ export class SolicitanteComponent {
   }
 
   public metodoGETSolicitante(): void {
-    this.verificarToken().then(isValid => {
-        if (isValid) {
-            const headers = this.getAuthHeaders();
-            this.http.get<{ Token: string; Solicitantes: Solicitante[] }>('http://localhost/Solicitante', { headers })
-                .subscribe({
-                    next: (response) => {
-                        // Extract the Solicitantes array from the response
-                        this.Solicitantes.set(response.Solicitantes);
-                    },
-                    error: (error) => {
-                        console.error('Error al obtener solicitantes:', error);
-                    }
-                });
-        } else {
-            console.error('Token inválido al obtener solicitantes');
-        }
+    this.verificarToken().then((isValid) => {
+      if (isValid) {
+        const headers = this.getAuthHeaders();
+        this.http
+          .get<{ Token: string; Solicitantes: Solicitante[] }>(
+            'http://localhost/Solicitante',
+            { headers }
+          )
+          .subscribe({
+            next: (response) => {
+              // Extract the Solicitantes array from the response
+              this.Solicitantes.set(response.Solicitantes);
+            },
+            error: (error) => {
+              console.error('Error al obtener solicitantes:', error);
+            },
+          });
+      } else {
+        console.error('Token inválido al obtener solicitantes');
+      }
     });
   }
-  
-  
 
-public agregarSolicitante(): void {
-  this.verificarToken().then(isValid => {
+  public agregarSolicitante(): void {
+    this.verificarToken().then((isValid) => {
       if (isValid) {
-          let cuerpo: Partial<Solicitante> = {
-              Nombre_Solicitante: this.Nombre_Solicitante,
-              Apellido_Solicitante: this.Apellido_Solicitante,
-              Email: this.Email,
-          };
+        let cuerpo: Partial<Solicitante> = {
+          Nombre_Solicitante: this.Nombre_Solicitante,
+          Apellido_Solicitante: this.Apellido_Solicitante,
+          Email: this.Email,
+        };
 
-          // Only include password if it's not empty
-          if (this.Contrasenna) {
-              cuerpo.Contrasenna = this.Contrasenna;
-          }
+        // Only include password if it's not empty
+        if (this.Contrasenna) {
+          cuerpo.Contrasenna = this.Contrasenna;
+        }
 
-          const headers = this.getAuthHeaders();
+        const headers = this.getAuthHeaders();
 
-          if (this.IdSolicitante) {
-              // Update only the fields that have changed
-              if (this.SolicitanteTemporal) {
-                  for (const key in cuerpo) {
-                      if (cuerpo[key as keyof Solicitante] === this.SolicitanteTemporal[key as keyof Solicitante]) {
-                          delete cuerpo[key as keyof Solicitante];
-                      }
-                  }
+        if (this.IdSolicitante) {
+          // Update only the fields that have changed
+          if (this.SolicitanteTemporal) {
+            for (const key in cuerpo) {
+              if (
+                cuerpo[key as keyof Solicitante] ===
+                this.SolicitanteTemporal[key as keyof Solicitante]
+              ) {
+                delete cuerpo[key as keyof Solicitante];
               }
-
-              this.http.put<{ Token: string }>(`http://localhost/Solicitante/${this.IdSolicitante}`, cuerpo, { headers })
-                  .subscribe({
-                      next: (response) => {
-                          this.Solicitantes.update((solicitantes) =>
-                              solicitantes.map((solicitante) =>
-                                  solicitante.IdSolicitante === this.IdSolicitante ? { ...solicitante, ...cuerpo } : solicitante
-                              )
-                          );
-                          this.LimpiarForm();
-                          this.actualizarToken(response.Token);
-                      },
-                      error: (error) => {
-                          console.error('Error updating solicitante:', error);
-                      }
-                  });
-          } else {
-              this.http.post<{ Solicitante: Solicitante, Token: string }>('http://localhost/solicitante', cuerpo, { headers })
-                  .subscribe({
-                      next: (response) => {
-                          this.Solicitantes.update((solicitantes) => [...solicitantes, response.Solicitante]);
-                          this.LimpiarForm();
-                          this.actualizarToken(response.Token);
-                      },
-                      error: (error) => {
-                          console.error('Error adding solicitante:', error);
-                      }
-                  });
+            }
           }
-      } else {
-          console.error('Token inválido al agregar solicitante');
-      }
-  });
-}
 
-public borrarSolicitante(IdSolicitante: any): void {
-  this.verificarToken().then(isValid => {
-      if (isValid) {
-          const headers = this.getAuthHeaders();
-          this.http.delete<{ Token: string }>(`http://localhost/Solicitante/${IdSolicitante}`, { headers })
-              .subscribe({
-                  next: (response) => {
-                      this.Solicitantes.update((solicitantes) => 
-                          solicitantes.filter((solicitante) => solicitante.IdSolicitante !== IdSolicitante)
-                      );
-                      this.actualizarToken(response.Token);
-                  },
-                  error: (error) => {
-                      console.error('Error al borrar solicitante:', error);
-                  }
-              });
+          this.http
+            .put<{ Token: string }>(
+              `http://localhost/Solicitante/${this.IdSolicitante}`,
+              cuerpo,
+              { headers }
+            )
+            .subscribe({
+              next: (response) => {
+                this.Solicitantes.update((solicitantes) =>
+                  solicitantes.map((solicitante) =>
+                    solicitante.IdSolicitante === this.IdSolicitante
+                      ? { ...solicitante, ...cuerpo }
+                      : solicitante
+                  )
+                );
+                this.LimpiarForm();
+                this.actualizarToken(response.Token);
+              },
+              error: (error) => {
+                console.error('Error updating solicitante:', error);
+              },
+            });
+        } else {
+          this.http
+            .post<{ Solicitante: Solicitante; Token: string }>(
+              'http://localhost/solicitante',
+              cuerpo,
+              { headers }
+            )
+            .subscribe({
+              next: (response) => {
+                this.Solicitantes.update((solicitantes) => [
+                  ...solicitantes,
+                  response.Solicitante,
+                ]);
+                this.LimpiarForm();
+                this.actualizarToken(response.Token);
+              },
+              error: (error) => {
+                console.error('Error adding solicitante:', error);
+              },
+            });
+        }
       } else {
-          console.error('Token inválido al borrar solicitante');
+        console.error('Token inválido al agregar solicitante');
       }
-  });
-}
+    });
+  }
 
-public modificarSolicitante(solicitante: Solicitante): void {
-  this.verificarToken().then(isValid => {
+  public borrarSolicitante(IdSolicitante: any): void {
+    this.verificarToken().then((isValid) => {
       if (isValid) {
-          this.Nombre_Solicitante = solicitante.Nombre_Solicitante;
-          this.Apellido_Solicitante = solicitante.Apellido_Solicitante;
-          this.Email = solicitante.Email;
-          this.Contrasenna = ''; // Clear the password field
-          this.IdSolicitante = solicitante.IdSolicitante ?? null;
-          this.SolicitanteTemporal = { ...solicitante }; // Store the original solicitante information temporarily
+        const headers = this.getAuthHeaders();
+        this.http
+          .delete<{ Token: string }>(
+            `http://localhost/Solicitante/${IdSolicitante}`,
+            { headers }
+          )
+          .subscribe({
+            next: (response) => {
+              this.Solicitantes.update((solicitantes) =>
+                solicitantes.filter(
+                  (solicitante) => solicitante.IdSolicitante !== IdSolicitante
+                )
+              );
+              this.actualizarToken(response.Token);
+            },
+            error: (error) => {
+              console.error('Error al borrar solicitante:', error);
+            },
+          });
       } else {
-          this.router.navigate(['/login']);
+        console.error('Token inválido al borrar solicitante');
       }
-  });
-}
+    });
+  }
+
+  public modificarSolicitante(solicitante: Solicitante): void {
+    this.verificarToken().then((isValid) => {
+      if (isValid) {
+        this.Nombre_Solicitante = solicitante.Nombre_Solicitante;
+        this.Apellido_Solicitante = solicitante.Apellido_Solicitante;
+        this.Email = solicitante.Email;
+        this.Contrasenna = ''; // Clear the password field
+        this.IdSolicitante = solicitante.IdSolicitante ?? null;
+        this.SolicitanteTemporal = { ...solicitante }; // Store the original solicitante information temporarily
+      } else {
+        this.router.navigate(['/login']);
+      }
+    });
+  }
 
   public selectSolicitante(solicitante: Solicitante): void {
     this.SolicitanteSeleccionado = solicitante;
@@ -186,7 +213,9 @@ public modificarSolicitante(solicitante: Solicitante): void {
   }
 
   public trackById(index: number, solicitante: Solicitante): number {
-    return solicitante.IdSolicitante !== undefined ? solicitante.IdSolicitante : index;
+    return solicitante.IdSolicitante !== undefined
+      ? solicitante.IdSolicitante
+      : index;
   }
 
   public SolicitantePorPagina(): Solicitante[] {
@@ -200,7 +229,6 @@ public modificarSolicitante(solicitante: Solicitante): void {
     const end = Math.min(start + this.itemPorPagina, solicitantesArray.length);
     return solicitantesArray.slice(start, end);
   }
-  
 
   public get TotalPaginas(): number {
     return Math.ceil(this.Solicitantes().length / this.itemPorPagina);

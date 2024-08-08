@@ -231,8 +231,8 @@ export class CitaComponent {
   public getServicioPorIdServicio(IdServicioEspecifico: number | null): void {
     // Ensure IdServicioEspecifico is defined and valid
     if (IdServicioEspecifico === null || IdServicioEspecifico === undefined) {
-        console.error('No IdServicioEspecifico provided');
-        return;
+      console.error('No IdServicioEspecifico provided');
+      return;
     }
 
     const headers = this.getAuthHeaders();
@@ -252,7 +252,7 @@ export class CitaComponent {
           // If you need only the first element, you can handle it here
           if (this.servicioEspecificos.length > 0) {
             const firstServicioEspecifico = this.servicioEspecificos[0];
-            this.selectedServicio = this.servicioEspecificos[0]
+            this.selectedServicio = this.servicioEspecificos[0];
             console.log('First Servicio Especifico:', firstServicioEspecifico);
             // Perform further actions with the first element if needed
           } else {
@@ -263,12 +263,7 @@ export class CitaComponent {
           console.error('Error al obtener servicios específicos:', error);
         },
       });
-}
-
-
-
-
-  
+  }
 
   public onSearchChange(): void {
     const solicitantesArray = this.Solicitantes().Solicitantes;
@@ -331,27 +326,29 @@ export class CitaComponent {
     this.verificarToken().then((isValid) => {
       if (isValid) {
         const cuerpo: Partial<Cita> = {};
-  
+
         // Use selectedDate directly
         if (this.selectedDate) {
           cuerpo.FechaCita = new Date(this.selectedDate);
         }
-  
+
         // Update fields from selectedSolicitante if it exists
         if (this.selectedSolicitante) {
           cuerpo.IdSolicitante = this.selectedSolicitante.IdSolicitante;
           cuerpo.Nombre_Cliente = this.selectedSolicitante.Nombre_Solicitante;
-          cuerpo.Apellido_Cliente = this.selectedSolicitante.Apellido_Solicitante;
+          cuerpo.Apellido_Cliente =
+            this.selectedSolicitante.Apellido_Solicitante;
           cuerpo.Correo_Cliente = this.selectedSolicitante.Email;
         }
-  
+
         // Update fields from selectedServicio if it exists
         if (this.selectedServicio) {
-          cuerpo.IdServicioEspecifico = this.selectedServicio.IdServicioEspecifico;
+          cuerpo.IdServicioEspecifico =
+            this.selectedServicio.IdServicioEspecifico;
         }
-  
+
         const headers = this.getAuthHeaders();
-  
+
         if (this.selectedCita?.IdCita) {
           this.http
             .put<{ Token: string }>(
@@ -392,7 +389,7 @@ export class CitaComponent {
       }
     });
   }
-  
+
   private LimpiarForm(): void {
     this.ServicioGeneralSeleccionado = null;
     this.ServicioGeneralFiltroSeleccionado = null;
@@ -407,7 +404,7 @@ export class CitaComponent {
     this.IdServicioEspecifico = null;
     this.IdSolicitante = null;
     this.EspecificosFiltrados = [];
-    this.busquedaNombre = "";
+    this.busquedaNombre = '';
     this.refreshCitas();
   }
 
@@ -491,36 +488,48 @@ export class CitaComponent {
   // In your component class
   public onModify(id: number): void {
     // Find the appointment in the filtered appointments list
-    const appointment = this.citas.find(app => app.IdCita === id);
-  
+    const appointment = this.citas.find((app) => app.IdCita === id);
+
     if (appointment) {
       // Populate the data with the found appointment
       this.Nombre_Cliente = appointment.Nombre_Cliente;
       this.Apellido_Cliente = appointment.Apellido_Cliente;
       this.Correo_Cliente = appointment.Correo_Cliente;
-      this.selectedDate = new Date(appointment.FechaCita).toISOString().split('T')[0]; // Format date for the input
+      this.selectedDate = new Date(appointment.FechaCita)
+        .toISOString()
+        .split('T')[0]; // Format date for the input
       this.IdServicioEspecifico = appointment.IdServicioEspecifico;
       this.IdSolicitante = appointment.IdSolicitante;
-  
+
       // Populate the search input with the client name
       this.busquedaNombre = appointment.Nombre_Cliente;
-  
+
       // Find and set the selected applicant, defaulting to null if not found
-      this.selectedSolicitante = this.SolicitantesFiltrados.find(applicant => applicant.IdSolicitante === appointment.IdSolicitante) || null;
+      this.selectedSolicitante =
+        this.SolicitantesFiltrados.find(
+          (applicant) => applicant.IdSolicitante === appointment.IdSolicitante
+        ) || null;
       const serviciosEspecificos = this.ServiciosEspecifico();
       // Find the specific service in FilterSpecifics
-      const specificService = serviciosEspecificos.find(service => service.IdServicioEspecifico === appointment.IdServicioEspecifico);
-      
+      const specificService = serviciosEspecificos.find(
+        (service) =>
+          service.IdServicioEspecifico === appointment.IdServicioEspecifico
+      );
+
       if (specificService) {
         // Ensure IdServicioEspecifico is a number or null
-        this.IdServicioEspecifico = specificService.IdServicioEspecifico ?? null;
-        
+        this.IdServicioEspecifico =
+          specificService.IdServicioEspecifico ?? null;
+
         // Find and set the corresponding general service
-        const generalService = this.ServiciosGeneral().find(service => service.IdServicio === specificService.IdServicio);
-        
+        const generalService = this.ServiciosGeneral().find(
+          (service) => service.IdServicio === specificService.IdServicio
+        );
+
         if (generalService) {
           // Set the selected general service in the dropdown
-          this.ServicioGeneralFiltroSeleccionado = specificService.IdServicio ?? null;
+          this.ServicioGeneralFiltroSeleccionado =
+            specificService.IdServicio ?? null;
           this.filterEspecificos();
           this.getServicioPorIdServicio(this.IdServicioEspecifico as number);
         } else {
@@ -529,17 +538,17 @@ export class CitaComponent {
       } else {
         console.error('Specific Service not found!');
       }
-  
+
       // Optionally, you might want to set the selectedAppointment to the current appointment
       this.selectedCita = appointment;
-  
+
       // Further actions (like opening a modal or enabling edit mode) can be handled here
       // Example: this.openEditModal();
     } else {
       console.error('Appointment not found!');
     }
   }
-  
+
   public onDeleteCita(idCita: number): void {
     const headers = this.getAuthHeaders();
     this.http.delete(`http://localhost/cita/${idCita}`, { headers }).subscribe({

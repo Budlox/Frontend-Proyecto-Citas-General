@@ -1,41 +1,63 @@
 <br />
 <br />
-  <h2>{{ Titulo }}</h2>
-  <div>
-    <label for="Nombre_Solicitante">Nombre de Solicitante:</label>
-    <input id="Nombre_Solicitante" [(ngModel)]="Nombre_Solicitante" type="text"/>
-    <br/>
+<h2>{{ Titulo }}</h2>
+<div>
+  <label for="Nombre_Solicitante">Nombre de Solicitante:</label>
+  <input id="Nombre_Solicitante" [(ngModel)]="Nombre_Solicitante" type="text" />
+  <br />
 
-    <label for="Apellido_Solicitante">Apellido del Solicitante:</label>
-    <input id="Apellido_Solicitante" [(ngModel)]="Apellido_Solicitante" type="text"/>
-    <br/>
+  <label for="Apellido_Solicitante">Apellido del Solicitante:</label>
+  <input
+    id="Apellido_Solicitante"
+    [(ngModel)]="Apellido_Solicitante"
+    type="text"
+  />
+  <br />
 
-    <label for="Email">Correo:</label>
-    <input id="Email" [(ngModel)]="Email" type="text"/>
-    <br/>
+  <label for="Email">Correo:</label>
+  <input id="Email" [(ngModel)]="Email" type="text" />
+  <br />
 
-    <label for="Contrasenna">Contraseña:</label>
-    <input id="Contrasenna" [(ngModel)]="Contrasenna" type="password"/>
-    <br/>
-    <br/>
-    <button (click)="agregarSolicitante()">Guardar</button>
-    <br/>
-  </div>
+  <label for="Contrasenna">Contraseña:</label>
+  <input id="Contrasenna" [(ngModel)]="Contrasenna" type="password" />
+  <br />
+  <br />
+  <button (click)="agregarSolicitante()">Guardar</button>
+  <br />
+</div>
 <br />
 <br />
 
 <h2>{{ Titulo2 }}</h2>
 
 <ul class="user-list">
-  <li *ngFor="let solicitante of SolicitantePorPagina(); let i = index; trackBy: trackById" 
-      [class.selected]="isSelected(solicitante)" 
-      (click)="selectSolicitante(solicitante)">
+  <li
+    *ngFor="
+      let solicitante of SolicitantePorPagina();
+      let i = index;
+      trackBy: trackById
+    "
+    [class.selected]="isSelected(solicitante)"
+    (click)="selectSolicitante(solicitante)"
+  >
     <div class="list-item">
       <div class="item-content">
-        <span class="order">{{ solicitante.IdSolicitante }}</span> {{ solicitante.Nombre_Solicitante + " "+ solicitante.Apellido_Solicitante }}
-        <button class="modify-button" (click)="modificarSolicitante(solicitante)">Modificar
+        <span class="order">{{ solicitante.IdSolicitante }}</span>
+        {{
+          solicitante.Nombre_Solicitante +
+            " " +
+            solicitante.Apellido_Solicitante
+        }}
+        <button
+          class="modify-button"
+          (click)="modificarSolicitante(solicitante)"
+        >
+          Modificar
         </button>
-        <button class="delete-button" (click)="borrarSolicitante(solicitante.IdSolicitante)">
+        <button
+          class="delete-button"
+          (click)="borrarSolicitante(solicitante.IdSolicitante)"
+        >
           Eliminar
         </button>
       </div>
@@ -46,8 +68,17 @@
 
 <div class="pagination">
   <div class="pagination-top">
-    <button (click)="PaginaAnterior()" [disabled]="PaginaActual === 1">Anterior</button>
-    <span class="pagination-text">Página {{ PaginaActual }} de {{ TotalPaginas }}</span>
-    <button (click)="PaginaSiguiente()" [disabled]="PaginaActual === TotalPaginas">Siguiente</button>
+    <button (click)="PaginaAnterior()" [disabled]="PaginaActual === 1">
+      Anterior
+    </button>
+    <span class="pagination-text"
+      >Página {{ PaginaActual }} de {{ TotalPaginas }}</span
+    >
+    <button
+      (click)="PaginaSiguiente()"
+      [disabled]="PaginaActual === TotalPaginas"
+    >
+      Siguiente
+    </button>
   </div>
 </div>

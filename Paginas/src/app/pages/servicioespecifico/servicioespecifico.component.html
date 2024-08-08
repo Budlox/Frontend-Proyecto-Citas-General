@@ -1,59 +1,98 @@
-<br/>
-<br/>
+<br />
+<br />
 <h2>{{ Titulo }}</h2>
 <div>
   <label for="NombreServicioEspecifico">Nombre del Servicio:</label>
-  <input id="NombreServicioEspecifico" [(ngModel)]="NombreServicioEspecifico" type="text"/>
-  <br/>
-  <br/>
+  <input
+    id="NombreServicioEspecifico"
+    [(ngModel)]="NombreServicioEspecifico"
+    type="text"
+  />
+  <br />
+  <br />
   <label for="CostoServicioEspecifico">Costo del Servicio:</label>
-  <input id="CostoServicioEspecifico" [(ngModel)]="CostoServicioEspecifico" type="number"/>
-  <br/>
-  <br/>
+  <input
+    id="CostoServicioEspecifico"
+    [(ngModel)]="CostoServicioEspecifico"
+    type="number"
+  />
+  <br />
+  <br />
   <!-- ComboBox for selecting ServicioGeneral -->
   <div>
     <label for="servicioGeneral">Seleccionar Servicio General:</label>
-    <select id="servicioGeneral" [(ngModel)]="ServicioGeneralSeleccionado" (change)="onSelectServicioGeneral($event)">
+    <select
+      id="servicioGeneral"
+      [(ngModel)]="ServicioGeneralSeleccionado"
+      (change)="onSelectServicioGeneral($event)"
+    >
       <option [value]="null">Seleccione un Servicio General</option>
-      <option *ngFor="let servicio of ServiciosGeneral()" [value]="servicio.IdServicio">
+      <option
+        *ngFor="let servicio of ServiciosGeneral()"
+        [value]="servicio.IdServicio"
+      >
         {{ servicio.NombreServicio }}
       </option>
     </select>
   </div>
-  <br/>
+  <br />
 
   <button (click)="guardarServicioEspecifico()">Guardar</button>
 </div>
 
-<br/>
+<br />
 
 <h2>{{ Titulo2 }}</h2>
 
 <div>
   <label for="servicioGeneralFiltro">Filtrar por Servicio General:</label>
-  <select id="servicioGeneralFiltro" [(ngModel)]="ServicioGeneralFiltroSeleccionado" (change)="onSelectServicioGeneralFiltro($event)">
+  <select
+    id="servicioGeneralFiltro"
+    [(ngModel)]="ServicioGeneralFiltroSeleccionado"
+    (change)="onSelectServicioGeneralFiltro($event)"
+  >
     <option [value]="null">Seleccione un Servicio General</option>
-    <option *ngFor="let servicio of ServiciosGeneral()" [value]="servicio.IdServicio">
+    <option
+      *ngFor="let servicio of ServiciosGeneral()"
+      [value]="servicio.IdServicio"
+    >
       {{ servicio.NombreServicio }}
     </option>
   </select>
 </div>
 
-<br/>
+<br />
 
 <label for="busquedaNombre">Buscar por nombre:</label>
-<input id="busquedaNombre" [(ngModel)]="busquedaNombre" (input)="onSearchChange()" type="text"/>
+<input
+  id="busquedaNombre"
+  [(ngModel)]="busquedaNombre"
+  (input)="onSearchChange()"
+  type="text"
+/>
 
 <ul class="servicio-especifico-list">
-  <li *ngFor="let servicio of EspecificosFiltrados; let i = index; trackBy: trackById">
+  <li
+    *ngFor="
+      let servicio of EspecificosFiltrados;
+      let i = index;
+      trackBy: trackById
+    "
+  >
     <div class="list-item">
       <div class="item-content">
-        <span class="order">{{ servicio.IdServicioEspecifico }}</span> {{ servicio.NombreServicioEspecifico }}
-        <button (click)="modificarServicioEspecifico(servicio)">Modificar</button>
-        <button (click)="borrarServicioEspecifico(servicio.IdServicioEspecifico)">Eliminar</button>
+        <span class="order">{{ servicio.IdServicioEspecifico }}</span>
+        {{ servicio.NombreServicioEspecifico }}
+        <button (click)="modificarServicioEspecifico(servicio)">
+          Modificar
+        </button>
+        <button
+          (click)="borrarServicioEspecifico(servicio.IdServicioEspecifico)"
+        >
+          Eliminar
+        </button>
       </div>
     </div>
   </li>
   <li *ngIf="EspecificosFiltrados.length === 0">Nada que mostrar.</li>
 </ul>
-

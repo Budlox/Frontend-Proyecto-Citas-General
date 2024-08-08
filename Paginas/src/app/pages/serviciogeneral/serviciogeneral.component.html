@@ -1,29 +1,40 @@
 <br />
 <br />
-  <h2>{{ Titulo }}</h2>
-  <div>
-    <label for="NombreServicio">Nombre del Servicio:</label>
-    <input id="NombreServicio" [(ngModel)]="NombreServicio" type="text"/>
-    <br/>
-    <br/>
-    <button (click)="agregarServicio()">Guardar</button>
-    <br/>
-  </div>
+<h2>{{ Titulo }}</h2>
+<div>
+  <label for="NombreServicio">Nombre del Servicio:</label>
+  <input id="NombreServicio" [(ngModel)]="NombreServicio" type="text" />
+  <br />
+  <br />
+  <button (click)="agregarServicio()">Guardar</button>
+  <br />
+</div>
 <br />
 <br />
 
 <h2>{{ Titulo2 }}</h2>
 
 <ul class="user-list">
-  <li *ngFor="let servicio of ServiciosPorPagina(); let i = index; trackBy: trackById"
-      [class.selected]="isSelected(servicio)"
-      (click)="selectServicio(servicio)">
+  <li
+    *ngFor="
+      let servicio of ServiciosPorPagina();
+      let i = index;
+      trackBy: trackById
+    "
+    [class.selected]="isSelected(servicio)"
+    (click)="selectServicio(servicio)"
+  >
     <div class="list-item">
       <div class="item-content">
-        <span class="order">{{ servicio.IdServicio }}</span> {{ servicio.NombreServicio }}
-        <button class="modify-button" (click)="modificarServicio(servicio)">Modificar
+        <span class="order">{{ servicio.IdServicio }}</span>
+        {{ servicio.NombreServicio }}
+        <button class="modify-button" (click)="modificarServicio(servicio)">
+          Modificar
         </button>
-        <button class="delete-button" (click)="borrarServicio(servicio.IdServicio)">
+        <button
+          class="delete-button"
+          (click)="borrarServicio(servicio.IdServicio)"
+        >
           Eliminar
         </button>
       </div>
@@ -32,11 +43,19 @@
   <li *ngIf="ServiciosPorPagina().length === 0">Nada que mostrar.</li>
 </ul>
 
-
 <div class="pagination">
   <div class="pagination-top">
-    <button (click)="PaginaAnterior()" [disabled]="PaginaActual === 1">Anterior</button>
-    <span class="pagination-text">Página {{ PaginaActual }} de {{ TotalPaginas }}</span>
-    <button (click)="PaginaSiguiente()" [disabled]="PaginaActual === TotalPaginas">Siguiente</button>
+    <button (click)="PaginaAnterior()" [disabled]="PaginaActual === 1">
+      Anterior
+    </button>
+    <span class="pagination-text"
+      >Página {{ PaginaActual }} de {{ TotalPaginas }}</span
+    >
+    <button
+      (click)="PaginaSiguiente()"
+      [disabled]="PaginaActual === TotalPaginas"
+    >
+      Siguiente
+    </button>
   </div>
 </div>
