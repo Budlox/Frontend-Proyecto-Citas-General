@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ServicioEspecifico } from '../../model/serviciosespecifico';
 import { ServicioGeneral } from '../../model/serviciosgeneral';
+import { jsPDF } from 'jspdf';
 
 @Component({
   selector: 'app-cita',
@@ -570,5 +571,69 @@ export class CitaComponent {
       // Optionally handle the case where no solicitante is selected
       console.log('No solicitante selected');
     }
+  }
+
+  private getCitaById(id: number): any {
+    return this.citas.find((app) => app.IdCita === id);
+  }
+
+  public onGeneratePDF(id: number): void {
+    // Fetch the selected appointment
+    const appointment = this.getCitaById(id);
+
+    if (!appointment) {
+      console.error('Cita no encontrada!');
+      return;
+    }
+
+    // Create a new PDF document
+    const doc = new jsPDF();
+
+    // Header
+    doc.setFontSize(16);
+    doc.text('Información de la cita', 10, 10);
+    doc.setFontSize(12);
+    doc.text('Fecha: ' + new Date().toLocaleDateString(), 10, 20);
+
+    // Table of appointment details
+    let startY = 30;
+
+    // Draw table headers
+    doc.setFillColor('#4b5be5');
+    doc.setTextColor('#ffffff');
+    doc.setFontSize(12);
+    doc.rect(10, startY, 190, 10, 'F'); // Header background
+    doc.text('Field', 10, startY + 7);
+    doc.text('Value', 100, startY + 7, { align: 'right' });
+
+    // Draw table content
+    startY += 15; // Start after header
+
+    doc.setTextColor('#000000');
+    doc.text('Id Cita', 10, startY);
+    doc.text(`${appointment.IdCita}`, 100, startY, { align: 'right' });
+    startY += 10;
+
+    doc.text('Fecha Cita', 10, startY);
+    doc.text(`${appointment.FechaCita.toLocaleDateString()}`, 100, startY, {
+      align: 'right',
+    });
+    startY += 10;
+
+    doc.text('Nombre', 10, startY);
+    doc.text(`${appointment.Nombre_Cliente}`, 100, startY, { align: 'right' });
+    startY += 10;
+
+    doc.text('Apellido', 10, startY);
+    doc.text(`${appointment.Apellido_Cliente}`, 100, startY, {
+      align: 'right',
+    });
+    startY += 10;
+
+    doc.text('Correo', 10, startY);
+    doc.text(`${appointment.Correo_Cliente}`, 100, startY, { align: 'right' });
+
+    // Save the document with the appointment ID in the filename
+    doc.save(`infoCita_${appointment.IdCita}.pdf`);
   }
 }

@@ -73,6 +73,7 @@ export class UsuarioComponent {
             next: (response) => {
               // Actualizar la lista de usuarios con los datos recibidos
               this.Usuarios = response.Usuarios;
+              console.log("Usuarios: ", this.Usuarios)
               this.actualizarToken(response.Token); // Actualizar el token en localStorage
             },
             error: (error) => {

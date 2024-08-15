@@ -188,8 +188,7 @@ button:disabled {
   background-color: #f4f4f4;
 }
 
-/* Add to your CSS file */
-
+/* Adjusted for the second container */
 .second-container {
   display: flex;
   justify-content: space-between;
@@ -269,7 +268,12 @@ button.delete-button:hover {
   background-color: #c82333; /* Darker red on hover */
 }
 
-button:disabled {
-  background-color: #c0c0c0;
-  cursor: not-allowed;
+/* Information Button Styling */
+button.information-button {
+  background-color: #e4f305; /* Yellow color */
+  color: black;
+}
+
+button.information-button:hover {
+  background-color: #a2ac00; /* Darker yellow on hover */
 }

@@ -199,6 +199,9 @@
               <button class="delete-button" (click)="onDeleteCita(item.id)">
                 Eliminar
               </button>
+              <button class="information-button" (click)="onGeneratePDF(item.id)">
+                Información
+              </button>
             </td>
           </tr>
           <tr *ngIf="filteredItems.length === 0">
